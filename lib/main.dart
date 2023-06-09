@@ -16,21 +16,25 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
+String gameName = ""; //PlayerName
+String tagLine = "";  //PlayerTag
+
+String apikey = 'RGAPI-2cf9ca1a-96b5-45a8-8b28-8ee44a7f81a5'; //Dev ApiKey
+String puuid = '';  //player puuid
+
 class _MyAppState extends State<MyApp> {
-  List<String> data = [];
+  TextEditingController gameNameedit = TextEditingController();
+  TextEditingController tagLineedit = TextEditingController();
+  var data = '';
   dynamic jsonData;
-
-  String shard = 'ap';
-  String puuid = '7603c738-ef8b-4f98-9138-654f484bc539';
-
-  String response = '';
+    String response = '';
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text("Page1 Header"),
+          title: const Text("Valorant Address"),
           backgroundColor: Colors.black,
         ),
         body: SingleChildScrollView(
@@ -39,19 +43,29 @@ class _MyAppState extends State<MyApp> {
                   child: Column(
                     children: [
                       Center(
-                        child: Text(data.toString()),
-                      ),
-                      Center(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
+                        child: Column(
+                          children:[
+                            TextField(
+                              controller: gameNameedit,
+                              decoration: const InputDecoration(hintText: "請輸入玩家名稱"),
+                            ),
+                            TextField(
+                              controller: tagLineedit,
+                              decoration: const InputDecoration(hintText: "請輸入玩家標籤",),
+                            ),
+                            ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                            ),
+                            onPressed: () {
+                              getpuuid();
+                            },
+                            child: const Text("取得玩家資訊"),
                           ),
-                          onPressed: () {
-                            get();
-                          },
-                          child: const Text("Button"),
+                          ]
                         ),
-                      )
+                      ),
+                      Text(data),
                     ],
                   ),
           ),
@@ -60,23 +74,32 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Future<void> get() async {
+  void getpuuid() async {
     try {
-      final response = await http.get(Uri.parse('https://ap.api.riotgames.com/val/content/v1/contents?locale=zh-TW&api_key=RGAPI-2cf9ca1a-96b5-45a8-8b28-8ee44a7f81a5'));
+      setState(() {
+        data = "";
+      });
+
+      if(gameNameedit.text == "" || tagLineedit.text == ""){
+        return;
+      }
+
+      gameName = gameNameedit.text;
+      tagLine = tagLineedit.text;
+
+      final response = await http.get(Uri.parse('https://asia.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}?api_key=${apikey}'));
       if (response.statusCode == 200) {
         jsonData = jsonDecode(response.body); // 更新 jsonData
 
-        final List<dynamic> dataList = jsonData['data'];
-
-        List<String> newData = [];
-        for (var item in dataList) {
-          newData.add(item['displayName']+"\n");
-        }
-
         setState(() {
-          data = newData;
+          puuid = jsonData['puuid'];
+          data = 'puuid:\n${puuid.toString()}\n\ngameName:\n${gameName.toString()}\n\ntagLine:\n${tagLine.toString()}';
+          print('${jsonData['puuid']}\n${jsonData['gameName']}\n${jsonData['tagLine']}');
         });
       } else {
+        setState(() {
+          data = "錯誤!找不到該玩家";
+        });
         print('Request failed with status: ${response.statusCode}');
       }
     } catch (error) {
@@ -84,9 +107,9 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  Future<void> post() async {
+  void post() async {
     try {
-      final url = Uri.parse('https://ap.api.riotgames.com/val/content/v1/contents?locale=zh-TW&api_key=RGAPI-2cf9ca1a-96b5-45a8-8b28-8ee44a7f81a5');
+      final url = Uri.parse('');
       final headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer riot_auth_token',
@@ -114,7 +137,7 @@ class _MyAppState extends State<MyApp> {
           }
 
           setState(() {
-            data = newData;
+            data = newData.toString();
           });
         });
       } else {
