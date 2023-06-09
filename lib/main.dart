@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -26,12 +27,13 @@ String puuid = '';  //player puuid
 class _MyAppState extends State<MyApp> {
   TextEditingController gameNameedit = TextEditingController();
   TextEditingController tagLineedit = TextEditingController();
-  var data = '請先輸入玩家資訊';
+  var play_im_data = '請先輸入玩家資訊';
   var jsonData;
 
-  String City = '';
+  String city = '';
   String response = '';
   String playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
+  String playerrankImageUrl = 'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
 
   @override
   Widget build(BuildContext context) {
@@ -55,78 +57,123 @@ class _MyAppState extends State<MyApp> {
           title: const Text("Valorant Address"),
           backgroundColor: Colors.black,
         ),
-        body: SingleChildScrollView(
-          child:Container(
-            alignment: Alignment.centerLeft,
-            margin: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Center(
-                        child: Column(
-                          children:[
-                            TextField(
-                              controller: gameNameedit,
-                              decoration: const InputDecoration(hintText: "請輸入玩家名稱"),
-                            ),
-                            TextField(
-                              controller: tagLineedit,
-                              decoration: const InputDecoration(hintText: "請輸入玩家標籤(不須輸入#)",),
-                            ),
-                            ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent,
-                            ),
-                            onPressed: () {
-                              buttonclick_getplayer_im();
-                            },
-                            child: const Text("取得玩家資訊"),
-                          ),
-                          ]
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(right: 10.0),
-                            child: Image.network(
-                              playersmallCardImageUrl,
-                              width: 90.0,
-                              height: 90.0,
-                            ),
-                          ),
-                          Text(
-                            data,
-                            textAlign: TextAlign.left,
-                          ),
-                        ],
-                      ),
-                    ],
+        body: Container(
+          alignment: Alignment.centerLeft,
+          margin: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: gameNameedit,
+                decoration: const InputDecoration(hintText: "請輸入玩家名稱"),
+              ),
+              TextField(
+                controller: tagLineedit,
+                decoration: const InputDecoration(hintText: "請輸入玩家標籤(不須輸入#)"),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[900],
                   ),
+                  onPressed: () {
+                    buttonclick_getplayer_im();
+                  },
+                  child: const Text("取得玩家資訊"),
+                ),
+              ),
+              SizedBox(height: 20), // 添加垂直间距
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(right: 10.0),
+                    child: Image.network(
+                      playersmallCardImageUrl,
+                      width: 90.0,
+                      height: 90.0,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      play_im_data,
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                  Container(
+                    child: Image.network(
+                      playerrankImageUrl,
+                      width: 90.0,
+                      height: 90.0,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-      )
+      ),
     );
   }
 
-  void buttonclick_getplayer_im() async {
-    Fluttertoast.showToast(
-        msg: "This is Center Short Toast",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0
-    );
+  void getplayer_mmr() async {  //抓取玩家牌位
     try {
+      final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v1/mmr/${city.toString()}/${gameName.toString()}/${tagLine.toString()}'));
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+        String? currenttierpatched = jsonData['data']['currenttierpatched'];
+        String? smallCardImageUrl = jsonData['data']['images']?['small'];
+        int? ranking_in_tier = jsonData['data']['ranking_in_tier'];
+
+        setState(() {
+          play_im_data = '${play_im_data.toString()}\n牌位：${currenttierpatched.toString()}\n競技分數：${ranking_in_tier.toString()}';
+          playerrankImageUrl = smallCardImageUrl.toString();
+        });
+
+        Fluttertoast.cancel();
+        Fluttertoast.showToast(
+            msg: "資料更新完成",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      } else {
+        print('Request failed with status: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  void buttonclick_getplayer_im() async {
+    try {
+
       setState(() {
         playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
-        data = "請先輸入玩家資訊";
+        playerrankImageUrl = 'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
+        play_im_data = "請先輸入玩家資訊";
       });
 
       if(gameNameedit.text == "" || tagLineedit.text == ""){
         return;
       }
+
+      Fluttertoast.cancel();
+      Fluttertoast.showToast(
+          msg: "資料驗證中",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
 
       gameName = gameNameedit.text;
       tagLine = tagLineedit.text;
@@ -149,16 +196,36 @@ class _MyAppState extends State<MyApp> {
         String? lastUpdate = jsonData['last_update'];
         int? lastUpdateRaw = jsonData['last_update_raw'];
 
+
+
         setState(() {
-          City = region.toString();
           playersmallCardImageUrl = smallCardImageUrl.toString();
-          data = '帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}';
-          print(data);
+          play_im_data = '帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}';
+          city = region.toString();
+          getplayer_mmr();
         });
+
+        Fluttertoast.cancel();
+        Fluttertoast.showToast(
+            msg: "驗證成功",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
       } else {
-        setState(() {
-          data = "錯誤!找不到該玩家";
-        });
+          Fluttertoast.cancel();
+          Fluttertoast.showToast(
+              msg: "錯誤!找不到該玩家",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
         print('Request failed with status: ${response.statusCode}');
       }
     } catch (error) {
