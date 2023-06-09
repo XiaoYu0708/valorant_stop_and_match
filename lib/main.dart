@@ -25,9 +25,12 @@ String puuid = '';  //player puuid
 class _MyAppState extends State<MyApp> {
   TextEditingController gameNameedit = TextEditingController();
   TextEditingController tagLineedit = TextEditingController();
-  var data = '';
-  dynamic jsonData;
-    String response = '';
+  var data = '請先輸入玩家資訊';
+  var jsonData;
+
+  String City = '';
+  String response = '';
+  String playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +42,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: SingleChildScrollView(
           child:Container(
+            alignment: Alignment.centerLeft,
             margin: const EdgeInsets.all(20),
                   child: Column(
                     children: [
@@ -51,21 +55,36 @@ class _MyAppState extends State<MyApp> {
                             ),
                             TextField(
                               controller: tagLineedit,
-                              decoration: const InputDecoration(hintText: "請輸入玩家標籤",),
+                              decoration: const InputDecoration(hintText: "請輸入玩家標籤(不須輸入#)",),
                             ),
                             ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
                             ),
                             onPressed: () {
-                              getpuuid();
+                              buttonclick_getplayer_im();
                             },
                             child: const Text("取得玩家資訊"),
                           ),
                           ]
                         ),
                       ),
-                      Text(data),
+                      Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(right: 10.0),
+                            child: Image.network(
+                              playersmallCardImageUrl,
+                              width: 90.0,
+                              height: 90.0,
+                            ),
+                          ),
+                          Text(
+                            data,
+                            textAlign: TextAlign.left,
+                          ),
+                        ],
+                      ),
                     ],
                   ),
           ),
@@ -74,10 +93,11 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void getpuuid() async {
+  void buttonclick_getplayer_im() async {
     try {
       setState(() {
-        data = "";
+        playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
+        data = "請先輸入玩家資訊";
       });
 
       if(gameNameedit.text == "" || tagLineedit.text == ""){
@@ -87,14 +107,29 @@ class _MyAppState extends State<MyApp> {
       gameName = gameNameedit.text;
       tagLine = tagLineedit.text;
 
-      final response = await http.get(Uri.parse('https://asia.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}?api_key=${apikey}'));
+      final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v1/account/${gameName.toString()}/${tagLine.toString()}?force=true'));
+
+
       if (response.statusCode == 200) {
-        jsonData = jsonDecode(response.body); // 更新 jsonData
+        Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+        String? puuid = jsonData['data']['puuid'];
+        String? region = jsonData['data']['region'];
+        int? accountLevel = jsonData['data']['account_level'];
+        String? name = jsonData['data']['name'];
+        String? tag = jsonData['data']['tag'];
+        String? smallCardImageUrl = jsonData['data']['card']?['small'];
+        String? largeCardImageUrl = jsonData['data']['card']?['large'];
+        String? wideCardImageUrl = jsonData['data']['card']?['wide'];
+        String? cardId = jsonData['data']['card']?['id'];
+        String? lastUpdate = jsonData['last_update'];
+        int? lastUpdateRaw = jsonData['last_update_raw'];
 
         setState(() {
-          puuid = jsonData['puuid'];
-          data = 'puuid:\n${puuid.toString()}\n\ngameName:\n${gameName.toString()}\n\ntagLine:\n${tagLine.toString()}';
-          print('${jsonData['puuid']}\n${jsonData['gameName']}\n${jsonData['tagLine']}');
+          City = region.toString();
+          playersmallCardImageUrl = smallCardImageUrl.toString();
+          data = '帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}';
+          print(data);
         });
       } else {
         setState(() {
@@ -107,44 +142,5 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  void post() async {
-    try {
-      final url = Uri.parse('');
-      final headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer riot_auth_token',
-        'X-Riot-Entitlements-JWT': 'riot_entitlement_token'
-      };
-      final body = {
-        'DisplayName': '',
-        'Subject': 'PLAYER_ID_SHOULD_BE_HERE',
-        'GameName': '',
-        'TagLine': ''
-      };
 
-      final response = await http.post(
-          url, headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        setState(() {
-          jsonData = jsonDecode(response.body);
-
-          final List<dynamic> dataList = jsonData['data'];
-
-          List<String> newData = [];
-          for (var item in dataList) {
-            newData.add(item['displayName']+"\n");
-          }
-
-          setState(() {
-            data = newData.toString();
-          });
-        });
-      } else {
-        print('Request failed with status: ${response.statusCode}');
-      }
-    } catch (error) {
-      print('Error: $error');
-    }
-  }
 }
