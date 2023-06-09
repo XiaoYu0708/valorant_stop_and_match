@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -35,6 +36,20 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        // Define the default brightness and colors.
+        brightness: Brightness.dark,
+        primaryColor: Colors.lightBlue[800],
+        // Define the default font family.
+        fontFamily: 'Georgia',
+        // Define the default `TextTheme`. Use this to specify the default
+        // text styling for headlines, titles, bodies of text, and more.
+        textTheme: const TextTheme(
+        displayLarge: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+        titleLarge: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+        bodyMedium: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+        ),
+      ),
       home: Scaffold(
         appBar: AppBar(
           title: const Text("Valorant Address"),
@@ -59,7 +74,7 @@ class _MyAppState extends State<MyApp> {
                             ),
                             ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
+                              backgroundColor: Colors.redAccent,
                             ),
                             onPressed: () {
                               buttonclick_getplayer_im();
@@ -94,6 +109,15 @@ class _MyAppState extends State<MyApp> {
   }
 
   void buttonclick_getplayer_im() async {
+    Fluttertoast.showToast(
+        msg: "This is Center Short Toast",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
     try {
       setState(() {
         playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
