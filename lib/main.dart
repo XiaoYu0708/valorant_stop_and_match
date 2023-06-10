@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -200,7 +199,7 @@ class _MyAppState extends State<MyApp> {
 
         setState(() {
           playersmallCardImageUrl = smallCardImageUrl.toString();
-          play_im_data = '帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}';
+          play_im_data = '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}';
           city = region.toString();
           getplayer_mmr();
         });
