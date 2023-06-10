@@ -116,6 +116,19 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  void toast(msg){
+    Fluttertoast.cancel();
+    Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+  }
+
   void getplayer_mmr() async {  //抓取玩家牌位
     try {
       final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v1/mmr/${city.toString()}/${gameName.toString()}/${tagLine.toString()}'));
@@ -132,16 +145,7 @@ class _MyAppState extends State<MyApp> {
           playerrankImageUrl = smallCardImageUrl.toString();
         });
 
-        Fluttertoast.cancel();
-        Fluttertoast.showToast(
-            msg: "資料更新完成",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0
-        );
+        toast("資料更新完成");
       } else {
         print('Request failed with status: ${response.statusCode}');
       }
@@ -160,25 +164,16 @@ class _MyAppState extends State<MyApp> {
       });
 
       if(gameNameedit.text == "" || tagLineedit.text == ""){
+        toast("請先輸入玩家資訊");
         return;
       }
 
-      Fluttertoast.cancel();
-      Fluttertoast.showToast(
-          msg: "資料驗證中",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0
-      );
+      toast("資料驗證中");
 
       gameName = gameNameedit.text;
       tagLine = tagLineedit.text;
 
       final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v1/account/${gameName.toString()}/${tagLine.toString()}?force=true'));
-
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
@@ -195,8 +190,6 @@ class _MyAppState extends State<MyApp> {
         String? lastUpdate = jsonData['last_update'];
         int? lastUpdateRaw = jsonData['last_update_raw'];
 
-
-
         setState(() {
           playersmallCardImageUrl = smallCardImageUrl.toString();
           play_im_data = '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}';
@@ -204,16 +197,7 @@ class _MyAppState extends State<MyApp> {
           getplayer_mmr();
         });
 
-        Fluttertoast.cancel();
-        Fluttertoast.showToast(
-            msg: "驗證成功",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0
-        );
+        toast("驗證成功");
       } else {
           Fluttertoast.cancel();
           Fluttertoast.showToast(
