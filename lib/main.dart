@@ -129,6 +129,46 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  void getplayer_match_history() async {  //抓取玩家歷史戰績
+    try {
+      final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v3/matches/${city.toString()}/${gameName.toString()}/${tagLine.toString()}'));
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+        String myteam = '';
+
+        for(var i=0;i<5;i++){
+
+          if(jsonData['data'][i]['metadata']['mode']!='Deathmatch'){
+            for(var j=0;j<10;j++){
+              String jname = jsonData['data'][i]['players']['all_players'][j]['name'];
+              String jtag = jsonData['data'][i]['players']['all_players'][j]['tag'];
+
+              if( jname.toString() == gameName && jtag.toString() == tagLine){
+                myteam = jsonData['data'][i]['players']['all_players'][j]['team'];
+                print((jsonData['data'][i]['teams'][myteam.toString()]['has_won']).toString());
+              }
+            }
+
+
+          }else{
+            print('Deathmatch');
+          }
+        }
+
+        setState(() {
+
+        });
+        toast("資料更新完成");
+      } else {
+        print('Request failed with status: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
   void getplayer_mmr() async {  //抓取玩家牌位
     try {
       final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v1/mmr/${city.toString()}/${gameName.toString()}/${tagLine.toString()}'));
@@ -145,7 +185,6 @@ class _MyAppState extends State<MyApp> {
           playerrankImageUrl = smallCardImageUrl.toString();
         });
 
-        toast("資料更新完成");
       } else {
         print('Request failed with status: ${response.statusCode}');
       }
@@ -195,6 +234,7 @@ class _MyAppState extends State<MyApp> {
           play_im_data = '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}';
           city = region.toString();
           getplayer_mmr();
+          getplayer_match_history();
         });
 
         toast("驗證成功");
