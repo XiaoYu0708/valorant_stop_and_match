@@ -136,10 +136,8 @@ class _MyAppState extends State<MyApp> {
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
 
-        String myteam = '';
-
         for(var i=0;i<5;i++){
-
+          String myteam = '';
           if(jsonData['data'][i]['metadata']['mode']!='Deathmatch'){
             for(var j=0;j<10;j++){
               String jname = jsonData['data'][i]['players']['all_players'][j]['name'];
@@ -147,11 +145,17 @@ class _MyAppState extends State<MyApp> {
 
               if( jname.toString() == gameName && jtag.toString() == tagLine){
                 myteam = jsonData['data'][i]['players']['all_players'][j]['team'];
-                print((jsonData['data'][i]['teams'][myteam.toString()]['has_won']).toString());
               }
             }
 
+            Map<String, dynamic> teams = await jsonData['data'][i]['teams'];
+            print(teams[myteam]);
 
+            if (teams[myteam] != null) {
+              print(teams[myteam]['has_won']);
+            } else {
+              print('No team found');
+            }
           }else{
             print('Deathmatch');
           }
@@ -169,7 +173,7 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  void getplayer_mmr() async {  //抓取玩家牌位
+  Future<String> getplayer_mmr() async {  //抓取玩家牌位
     try {
       final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v1/mmr/${city.toString()}/${gameName.toString()}/${tagLine.toString()}'));
 
@@ -185,17 +189,20 @@ class _MyAppState extends State<MyApp> {
           playerrankImageUrl = smallCardImageUrl.toString();
         });
 
+        return '牌位：${currenttierpatched.toString()}\n競技分數：${ranking_in_tier.toString()}';
+
       } else {
         print('Request failed with status: ${response.statusCode}');
+        return "Request failed with status: ${response.statusCode}";
       }
     } catch (error) {
       print('Error: $error');
+      return "Error: $error";
     }
   }
 
   void buttonclick_getplayer_im() async {
     try {
-
       setState(() {
         playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
         playerrankImageUrl = 'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
@@ -229,26 +236,20 @@ class _MyAppState extends State<MyApp> {
         String? lastUpdate = jsonData['last_update'];
         int? lastUpdateRaw = jsonData['last_update_raw'];
 
+        city = region.toString();
+
+        String mmr = await getplayer_mmr();
+
+        getplayer_match_history();
+
         setState(() {
+          play_im_data = '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}\n${mmr.toString()}';
           playersmallCardImageUrl = smallCardImageUrl.toString();
-          play_im_data = '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}';
-          city = region.toString();
-          getplayer_mmr();
-          getplayer_match_history();
         });
 
         toast("驗證成功");
       } else {
-          Fluttertoast.cancel();
-          Fluttertoast.showToast(
-              msg: "錯誤!找不到該玩家",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 16.0
-          );
+          toast("錯誤!找不到該玩家");
         print('Request failed with status: ${response.statusCode}');
       }
     } catch (error) {
