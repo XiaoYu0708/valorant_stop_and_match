@@ -34,6 +34,8 @@ class _MyAppState extends State<MyApp> {
   String playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
   String playerrankImageUrl = 'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
 
+  List<Widget> generatedWidgets = [];
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -70,6 +72,7 @@ class _MyAppState extends State<MyApp> {
                 controller: tagLineedit,
                 decoration: const InputDecoration(hintText: "請輸入玩家標籤(不須輸入#)"),
               ),
+              const Text(""),
               Align(
                 alignment: Alignment.center,
                 child: ElevatedButton(
@@ -109,12 +112,21 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ],
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
+                    children: generatedWidgets,
+                  ),
+                ],
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
 
   void toast(msg){
     Fluttertoast.cancel();
@@ -136,40 +148,57 @@ class _MyAppState extends State<MyApp> {
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
 
-        for(var i=0;i<5;i++){
-          String myteam = '';
-          if(jsonData['data'][i]['metadata']['mode']!='Deathmatch'){
-            for(var j=0;j<10;j++){
-              String jname = jsonData['data'][i]['players']['all_players'][j]['name'];
-              String jtag = jsonData['data'][i]['players']['all_players'][j]['tag'];
+        String myteam = '';
+        String rt = '';
 
-              if( jname.toString() == gameName && jtag.toString() == tagLine){
-                myteam = jsonData['data'][i]['players']['all_players'][j]['team'];
+        int n = 10;
+
+        for(var i=0;i<5;i++) {
+          n = jsonData['data'][i]['players']['all_players'].length - 1;
+          for (var j = 0; j < n; j++) {
+            String jmap = jsonData['data'][i]['metadata']['map'];
+            String jname = jsonData['data'][i]['players']['all_players'][j]['name'];
+            String jtag = jsonData['data'][i]['players']['all_players'][j]['tag'];
+            String jmode = jsonData['data'][i]['metadata']['mode'];
+            int jk = jsonData['data'][i]['players']['all_players'][j]['stats']['kills'];
+            int jd = jsonData['data'][i]['players']['all_players'][j]['stats']['deaths'];
+            int ja = jsonData['data'][i]['players']['all_players'][j]['stats']['assists'];
+
+            List<String> en_US_map = ["Bind", "Haven", "Split", "Ascent","IceBox", "Breeze", "Fracture","Pearl","Lotus"];
+            List<String> zh_TW_map = ["劫境之地","遺落境地","雙塔迷城","義境空島","極地寒港","熱帶樂園","天漠之峽","深海遺珠","蓮華古城"];
+
+            List<String> en_US_mode = ["Unrated","Competitive","Spikerush","Deathmatch","Escalation","Replication","Snowballfight","Swiftplay","Customgame"];
+            List<String> zh_TW_mode = ["一般模式","競技模式","輻能搶攻戰","死鬥模式","超激進戰","複製亂戰","打雪仗","超速衝點","自訂模式"];
+
+            jmap = zh_TW_map[en_US_map.indexOf(jmap)];
+            jmode = zh_TW_mode[en_US_mode.indexOf(jmode)];
+
+            myteam = jsonData['data'][i]['players']['all_players'][j]['team'];
+            myteam = myteam.toLowerCase();
+
+            if (jname.toString() == gameName && jtag.toString() == tagLine) {
+              if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
+                rt = '${jmap}\t${jmode}\t${jk}/${jd}/${ja}';
+              }else{
+                if (jsonData['data'][i]['teams'][myteam]['has_won'] == true) {
+                  rt = '${jmap}\t${jmode}\t${jk}/${jd}/${ja}\tWin';
+                } else {
+                  rt = '${jmap}\t${jmode}\t${jk}/${jd}/${ja}\tLoss';
+                }
               }
             }
-
-            Map<String, dynamic> teams = await jsonData['data'][i]['teams'];
-            print(teams[myteam]);
-
-            if (teams[myteam] != null) {
-              print(teams[myteam]['has_won']);
-            } else {
-              print('No team found');
-            }
-          }else{
-            print('Deathmatch');
           }
+          Widget widget = Text(rt);
+          generatedWidgets.add(widget);
         }
-
-        setState(() {
-
-        });
-        toast("資料更新完成");
+        setState(() {});
       } else {
         print('Request failed with status: ${response.statusCode}');
       }
+      toast("資料更新完成");
     } catch (error) {
       print('Error: $error');
+      toast("抓取玩家歷史戰績錯誤");
     }
   }
 
@@ -184,10 +213,7 @@ class _MyAppState extends State<MyApp> {
         String? smallCardImageUrl = jsonData['data']['images']?['small'];
         int? ranking_in_tier = jsonData['data']['ranking_in_tier'];
 
-        setState(() {
-          play_im_data = '${play_im_data.toString()}\n牌位：${currenttierpatched.toString()}\n競技分數：${ranking_in_tier.toString()}';
-          playerrankImageUrl = smallCardImageUrl.toString();
-        });
+        playerrankImageUrl = smallCardImageUrl.toString();
 
         return '牌位：${currenttierpatched.toString()}\n競技分數：${ranking_in_tier.toString()}';
 
@@ -207,6 +233,7 @@ class _MyAppState extends State<MyApp> {
         playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
         playerrankImageUrl = 'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
         play_im_data = "請先輸入玩家資訊";
+        generatedWidgets.clear();
       });
 
       if(gameNameedit.text == "" || tagLineedit.text == ""){
@@ -242,10 +269,8 @@ class _MyAppState extends State<MyApp> {
 
         getplayer_match_history();
 
-        setState(() {
-          play_im_data = '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}\n${mmr.toString()}';
-          playersmallCardImageUrl = smallCardImageUrl.toString();
-        });
+        play_im_data = '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}\n${mmr.toString()}';
+        playersmallCardImageUrl = smallCardImageUrl.toString();
 
         toast("驗證成功");
       } else {
@@ -256,6 +281,4 @@ class _MyAppState extends State<MyApp> {
       print('Error: $error');
     }
   }
-
-
 }
