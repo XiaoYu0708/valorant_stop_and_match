@@ -197,7 +197,9 @@ class _MyAppState extends State<MyApp> {
       print('Error: $error');
       toast("抓取玩家歷史戰績錯誤");
     }finally{
-      isButtonDisabled = false;
+      setState(() {
+        isButtonDisabled = false;
+      });
     }
   }
 
@@ -223,8 +225,6 @@ class _MyAppState extends State<MyApp> {
     } catch (error) {
       print('Error: $error');
       return "Error: $error";
-    }finally{
-      isButtonDisabled = false;
     }
   }
 
@@ -240,6 +240,9 @@ class _MyAppState extends State<MyApp> {
 
       if(gameNameedit.text == "" || tagLineedit.text == ""){
         toast("請先輸入玩家資訊");
+        setState(() {
+          isButtonDisabled = false;
+        });
         return;
       }
 
@@ -281,7 +284,6 @@ class _MyAppState extends State<MyApp> {
       }
     } catch (error) {
       print('Error: $error');
-    }finally{
       setState(() {
         isButtonDisabled = false;
       });
