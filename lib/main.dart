@@ -26,6 +26,8 @@ String puuid = '';  //player puuid
 class _MyAppState extends State<MyApp> {
   TextEditingController gameNameedit = TextEditingController();
   TextEditingController tagLineedit = TextEditingController();
+  bool isButtonDisabled = false;
+
   var play_im_data = '請先輸入玩家資訊';
   var jsonData;
 
@@ -79,18 +81,18 @@ class _MyAppState extends State<MyApp> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red[900],
                   ),
-                  onPressed: () {
+                  onPressed: isButtonDisabled ? null : () {
                     buttonclick_getplayer_im();
                   },
                   child: const Text("取得玩家資訊"),
                 ),
               ),
-              SizedBox(height: 20), // 添加垂直间距
+              const SizedBox(height: 20), // 添加垂直间距
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    margin: EdgeInsets.only(right: 10.0),
+                    margin: const EdgeInsets.only(right: 10.0),
                     child: Image.network(
                       playersmallCardImageUrl,
                       width: 90.0,
@@ -103,12 +105,10 @@ class _MyAppState extends State<MyApp> {
                       textAlign: TextAlign.left,
                     ),
                   ),
-                  Container(
-                    child: Image.network(
-                      playerrankImageUrl,
-                      width: 90.0,
-                      height: 90.0,
-                    ),
+                  Image.network(
+                    playerrankImageUrl,
+                    width: 90.0,
+                    height: 90.0,
                   ),
                 ],
               ),
@@ -141,7 +141,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void getplayer_match_history() async {  //抓取玩家歷史戰績
+   void getplayer_match_history() async {  //抓取玩家歷史戰績
     try {
       final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v3/matches/${city.toString()}/${gameName.toString()}/${tagLine.toString()}'));
 
@@ -151,11 +151,8 @@ class _MyAppState extends State<MyApp> {
         String myteam = '';
         String rt = '';
 
-        int n = 10;
-
-        for(var i=0;i<5;i++) {
-          n = jsonData['data'][i]['players']['all_players'].length - 1;
-          for (var j = 0; j < n; j++) {
+        for(var i=0;i<jsonData['data'].length;i++) {
+          for (var j = 0; j < jsonData['data'][i]['players']['all_players'].length; j++) {
             String jmap = jsonData['data'][i]['metadata']['map'];
             String jname = jsonData['data'][i]['players']['all_players'][j]['name'];
             String jtag = jsonData['data'][i]['players']['all_players'][j]['tag'];
@@ -199,6 +196,8 @@ class _MyAppState extends State<MyApp> {
     } catch (error) {
       print('Error: $error');
       toast("抓取玩家歷史戰績錯誤");
+    }finally{
+      isButtonDisabled = false;
     }
   }
 
@@ -224,12 +223,15 @@ class _MyAppState extends State<MyApp> {
     } catch (error) {
       print('Error: $error');
       return "Error: $error";
+    }finally{
+      isButtonDisabled = false;
     }
   }
 
   void buttonclick_getplayer_im() async {
     try {
       setState(() {
+        isButtonDisabled = true;
         playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
         playerrankImageUrl = 'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
         play_im_data = "請先輸入玩家資訊";
@@ -274,11 +276,15 @@ class _MyAppState extends State<MyApp> {
 
         toast("驗證成功");
       } else {
-          toast("錯誤!找不到該玩家");
+        toast("錯誤!找不到該玩家");
         print('Request failed with status: ${response.statusCode}');
       }
     } catch (error) {
       print('Error: $error');
+    }finally{
+      setState(() {
+        isButtonDisabled = false;
+      });
     }
   }
 }
