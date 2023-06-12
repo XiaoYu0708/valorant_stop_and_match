@@ -151,7 +151,7 @@ class _MyAppState extends State<MyApp> {
         String myteam = '';
         String rt = '';
 
-        for(var i=0;i<jsonData['data'].length;i++) {
+        for(var i = 0;i<jsonData['data'].length;i++) {
           for (var j = 0; j < jsonData['data'][i]['players']['all_players'].length; j++) {
             String jmap = jsonData['data'][i]['metadata']['map'];
             String jname = jsonData['data'][i]['players']['all_players'][j]['name'];
@@ -161,7 +161,7 @@ class _MyAppState extends State<MyApp> {
             int jd = jsonData['data'][i]['players']['all_players'][j]['stats']['deaths'];
             int ja = jsonData['data'][i]['players']['all_players'][j]['stats']['assists'];
 
-            List<String> en_US_map = ["Bind", "Haven", "Split", "Ascent","IceBox", "Breeze", "Fracture","Pearl","Lotus"];
+            List<String> en_US_map = ["Bind", "Haven", "Split", "Ascent","Icebox", "Breeze", "Fracture","Pearl","Lotus"];
             List<String> zh_TW_map = ["劫境之地","遺落境地","雙塔迷城","義境空島","極地寒港","熱帶樂園","天漠之峽","深海遺珠","蓮華古城"];
 
             List<String> en_US_mode = ["Unrated","Competitive","Spikerush","Deathmatch","Escalation","Replication","Snowballfight","Swiftplay","Customgame"];
@@ -170,13 +170,12 @@ class _MyAppState extends State<MyApp> {
             jmap = zh_TW_map[en_US_map.indexOf(jmap)];
             jmode = zh_TW_mode[en_US_mode.indexOf(jmode)];
 
-            myteam = jsonData['data'][i]['players']['all_players'][j]['team'];
-            myteam = myteam.toLowerCase();
-
             if (jname.toString() == gameName && jtag.toString() == tagLine) {
               if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
                 rt = '${jmap}\t${jmode}\t${jk}/${jd}/${ja}';
               }else{
+                myteam = jsonData['data'][i]['players']['all_players'][j]['team'];
+                myteam = myteam.toLowerCase();
                 if (jsonData['data'][i]['teams'][myteam]['has_won'] == true) {
                   rt = '${jmap}\t${jmode}\t${jk}/${jd}/${ja}\tWin';
                 } else {
