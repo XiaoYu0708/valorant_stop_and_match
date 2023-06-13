@@ -31,12 +31,13 @@ class _MyAppState extends State<MyApp> {
   var play_im_data = '請先輸入玩家資訊';
   var jsonData;
 
+  String? puuid = '';
   String city = '';
   String response = '';
   String playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
   String playerrankImageUrl = 'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
 
-  List<Widget> generatedWidgets = [];
+  List<TableRow> matchtableRows = [];
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +64,7 @@ class _MyAppState extends State<MyApp> {
         body: Container(
           alignment: Alignment.centerLeft,
           margin: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
             children: [
               TextField(
                 controller: gameNameedit,
@@ -112,13 +112,18 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    children: generatedWidgets,
-                  ),
-                ],
+              Table(
+                columnWidths: const {
+                  0: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
+                  1: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
+                  2: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
+                  3: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
+                  4: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
+                  5: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
+                },
+                border: TableBorder.all(),
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                children: matchtableRows,
               ),
             ],
           ),
@@ -143,7 +148,7 @@ class _MyAppState extends State<MyApp> {
 
    void getplayer_match_history() async {  //抓取玩家歷史戰績
     try {
-      final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v3/matches/${city.toString()}/${gameName.toString()}/${tagLine.toString()}'));
+      final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v3/by-puuid/matches/${city.toString()}/${puuid.toString()}?size=10'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
@@ -151,8 +156,11 @@ class _MyAppState extends State<MyApp> {
         String myteam = '';
         String rt = '';
 
+        List<List<String>> tableData = [['地圖','模式','K','D','A','勝敗']]; //地圖,模式,K,D,A,勝敗
+
         for(var i = 0;i<jsonData['data'].length;i++) {
-          for (var j = 0; j < jsonData['data'][i]['players']['all_players'].length; j++) {
+          for (var j = 0; j <
+              jsonData['data'][i]['players']['all_players'].length; j++) {
             String jmap = jsonData['data'][i]['metadata']['map'];
             String jname = jsonData['data'][i]['players']['all_players'][j]['name'];
             String jtag = jsonData['data'][i]['players']['all_players'][j]['tag'];
@@ -161,32 +169,88 @@ class _MyAppState extends State<MyApp> {
             int jd = jsonData['data'][i]['players']['all_players'][j]['stats']['deaths'];
             int ja = jsonData['data'][i]['players']['all_players'][j]['stats']['assists'];
 
-            List<String> en_US_map = ["Bind", "Haven", "Split", "Ascent","Icebox", "Breeze", "Fracture","Pearl","Lotus"];
-            List<String> zh_TW_map = ["劫境之地","遺落境地","雙塔迷城","義境空島","極地寒港","熱帶樂園","天漠之峽","深海遺珠","蓮華古城"];
+            List<String> en_US_map = [
+              "Bind",
+              "Haven",
+              "Split",
+              "Ascent",
+              "Icebox",
+              "Breeze",
+              "Fracture",
+              "Pearl",
+              "Lotus"
+            ];
+            List<String> zh_TW_map = [
+              "劫境之地",
+              "遺落境地",
+              "雙塔迷城",
+              "義境空島",
+              "極地寒港",
+              "熱帶樂園",
+              "天漠之峽",
+              "深海遺珠",
+              "蓮華古城"
+            ];
 
-            List<String> en_US_mode = ["Unrated","Competitive","Spikerush","Deathmatch","Escalation","Replication","Snowballfight","Swiftplay","Customgame"];
-            List<String> zh_TW_mode = ["一般模式","競技模式","輻能搶攻戰","死鬥模式","超激進戰","複製亂戰","打雪仗","超速衝點","自訂模式"];
+            List<String> en_US_mode = [
+              "Unrated",
+              "Competitive",
+              "Spikerush",
+              "Deathmatch",
+              "Escalation",
+              "Replication",
+              "Snowballfight",
+              "Swiftplay",
+              "Customgame"
+            ];
+            List<String> zh_TW_mode = [
+              "一般模式",
+              "競技模式",
+              "輻能搶攻戰",
+              "死鬥模式",
+              "超激進戰",
+              "複製亂戰",
+              "打雪仗",
+              "超速衝點",
+              "自訂模式"
+            ];
 
             jmap = zh_TW_map[en_US_map.indexOf(jmap)];
             jmode = zh_TW_mode[en_US_mode.indexOf(jmode)];
 
             if (jname.toString() == gameName && jtag.toString() == tagLine) {
               if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
-                rt = '${jmap}\t${jmode}\t${jk}/${jd}/${ja}';
-              }else{
+                tableData.add([jmap, jmode, jk.toString(), jd.toString(),ja.toString(),'']);
+              } else {
                 myteam = jsonData['data'][i]['players']['all_players'][j]['team'];
                 myteam = myteam.toLowerCase();
                 if (jsonData['data'][i]['teams'][myteam]['has_won'] == true) {
-                  rt = '${jmap}\t${jmode}\t${jk}/${jd}/${ja}\tWin';
+                  tableData.add([jmap, jmode, jk.toString(), jd.toString(),ja.toString(),'Win']);
                 } else {
-                  rt = '${jmap}\t${jmode}\t${jk}/${jd}/${ja}\tLoss';
+                  tableData.add([jmap, jmode, jk.toString(), jd.toString(),ja.toString(),'Loss']);
                 }
               }
             }
           }
-          Widget widget = Text(rt);
-          generatedWidgets.add(widget);
         }
+
+        for (var rowData in tableData) {
+          List<Widget> cells = [];
+          for (var cellData in rowData) {
+            cells.add(
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(cellData),
+              ),
+            );
+          }
+          matchtableRows.add(
+            TableRow(
+              children: cells,
+            ),
+          );
+        }
+
         setState(() {});
       } else {
         print('Request failed with status: ${response.statusCode}');
@@ -234,7 +298,7 @@ class _MyAppState extends State<MyApp> {
         playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
         playerrankImageUrl = 'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
         play_im_data = "請先輸入玩家資訊";
-        generatedWidgets.clear();
+        matchtableRows.clear();
       });
 
       if(gameNameedit.text == "" || tagLineedit.text == ""){
@@ -255,7 +319,7 @@ class _MyAppState extends State<MyApp> {
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
 
-        String? puuid = jsonData['data']['puuid'];
+        puuid = jsonData['data']['puuid'];
         String? region = jsonData['data']['region'];
         int? accountLevel = jsonData['data']['account_level'];
         String? name = jsonData['data']['name'];
@@ -280,6 +344,9 @@ class _MyAppState extends State<MyApp> {
       } else {
         toast("錯誤!找不到該玩家");
         print('Request failed with status: ${response.statusCode}');
+        setState(() {
+          isButtonDisabled = false;
+        });
       }
     } catch (error) {
       print('Error: $error');
