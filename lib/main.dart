@@ -155,7 +155,6 @@ class _MyAppState extends State<MyApp> {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
 
         String myteam = '';
-        String rt = '';
 
         List<List<String>> tableData = [
           ['地圖', '模式', 'K', 'D', 'A', 'KDA', '勝敗']
