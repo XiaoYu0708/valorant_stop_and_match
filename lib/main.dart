@@ -123,7 +123,7 @@ class _MyAppState extends State<MyApp> {
                   5: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
                   6: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
                 },
-                border: TableBorder.all(),
+                border: TableBorder.all(color: Colors.transparent),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                 children: matchtableRows,
               ),
@@ -296,7 +296,7 @@ class _MyAppState extends State<MyApp> {
           row = TableRow(
             children: row.children.map((widget) {
               return Container(
-                color: Colors.green[300],
+                color: Colors.green[200],
                 child: widget,
               );
             }).toList(),
@@ -305,7 +305,7 @@ class _MyAppState extends State<MyApp> {
           row = TableRow(
             children: row.children.map((widget) {
               return Container(
-                color: Colors.red[300],
+                color: Colors.red[200],
                 child: widget,
               );
             }).toList(),
