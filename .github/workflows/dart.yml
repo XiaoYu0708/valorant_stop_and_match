@@ -23,8 +23,9 @@ jobs:
       run: |
         git config --local user.email "weitsungyu@gmail.com"
         git config --local user.name "xiaoyu0708"
-        git commit -a -m "Add changes"
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        branch: ${{ github.head_ref }}
+        git add .
+        git commit -m "Update"
+        git branch -M main
+        git remote add origin https://github.com/XiaoYu0708/valorant_stop_and_match.git
+        git push -u origin main
+      
