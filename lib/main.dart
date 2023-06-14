@@ -271,51 +271,45 @@ class _MyAppState extends State<MyApp> {
           }
         }
 
-      for (var rowData in tableData) {
-        List<Widget> cells = [];
-        for (var cellData in rowData) {
-          cells.add(
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(cellData),
-            ),
-          );
+        for (var rowData in tableData) {
+          List<Widget> cells = [];
+          for (var cellData in rowData) {
+            cells.add(
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(cellData),
+              ),
+            );
+          }
+
+          if(!rowData.contains("Win") && !rowData.contains("Loss")){
+            matchtableRows.add(
+              TableRow(
+                children: cells,
+              ),
+            );
+          }else if(rowData.contains("Win") ){
+            matchtableRows.add(
+              TableRow(
+                decoration: BoxDecoration(
+                  color: Colors.green[400],
+                ),
+                children: cells,
+              ),
+            );
+          }else if(rowData.contains("Loss")){
+            matchtableRows.add(
+              TableRow(
+                decoration: BoxDecoration(
+                  color: Colors.red[400],
+                ),
+                children: cells,
+              ),
+            );
+          }
+
+
         }
-
-        TableRow row = TableRow(children: cells);
-
-        if(!rowData.contains("Win") && !rowData.contains("Loss")){
-          row = TableRow(
-            children: row.children.map((widget) {
-              return Container(
-                child: widget,
-              );
-            }).toList(),
-          );
-        }else if(rowData.contains("Win") ){
-          row = TableRow(
-            children: row.children.map((widget) {
-              return Container(
-                color: Colors.green[200],
-                child: widget,
-              );
-            }).toList(),
-          );
-        }else if(rowData.contains("Loss")){
-          row = TableRow(
-            children: row.children.map((widget) {
-              return Container(
-                color: Colors.red[200],
-                child: widget,
-              );
-            }).toList(),
-          );
-        }
-
-        matchtableRows.add(row);
-      }
-
-
 
         setState(() {});
       } else {
