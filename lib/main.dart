@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -157,9 +158,11 @@ class _MyAppState extends State<MyApp> {
         String myteam = '';
         String rt = '';
 
-        List<List<String>> tableData = [['地圖','模式','K','D','A','KDA','勝敗']]; //地圖,模式,K,D,A,KDA,勝敗
+        List<List<String>> tableData = [
+          ['地圖', '模式', 'K', 'D', 'A', 'KDA', '勝敗']
+        ]; //地圖,模式,K,D,A,KDA,勝敗
 
-        for(var i = 0;i<jsonData['data'].length;i++) {
+        for (var i = 0; i < jsonData['data'].length; i++) {
           for (var j = 0; j <
               jsonData['data'][i]['players']['all_players'].length; j++) {
             String jmap = jsonData['data'][i]['metadata']['map'];
@@ -221,44 +224,98 @@ class _MyAppState extends State<MyApp> {
 
             String? jkda = '';
 
-            if(jd == 0){
-              jkda = (((jk+ja)).toStringAsFixed(1));
-            }else{
-              jkda = (((jk+ja)/jd).toStringAsFixed(1));
+            if (jd == 0) {
+              jkda = ((jk).toStringAsFixed(1));
+            } else {
+              jkda = ((jk / jd).toStringAsFixed(1));
             }
 
             if (jname.toString() == gameName && jtag.toString() == tagLine) {
               if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
-                tableData.add([jmap, jmode, jk.toString(), jd.toString(),ja.toString(),jkda.toString(),'']);
+                tableData.add([
+                  jmap,
+                  jmode,
+                  jk.toString(),
+                  jd.toString(),
+                  ja.toString(),
+                  jkda.toString(),
+                  ''
+                ]);
               } else {
-                myteam = jsonData['data'][i]['players']['all_players'][j]['team'];
+                myteam =
+                jsonData['data'][i]['players']['all_players'][j]['team'];
                 myteam = myteam.toLowerCase();
                 if (jsonData['data'][i]['teams'][myteam]['has_won'] == true) {
-                  tableData.add([jmap, jmode, jk.toString(), jd.toString(),ja.toString(),jkda.toString(),'Win']);
+                  tableData.add([
+                    jmap,
+                    jmode,
+                    jk.toString(),
+                    jd.toString(),
+                    ja.toString(),
+                    jkda.toString(),
+                    'Win'
+                  ]);
                 } else {
-                  tableData.add([jmap, jmode, jk.toString(), jd.toString(),ja.toString(),jkda.toString(),'Loss']);
+                  tableData.add([
+                    jmap,
+                    jmode,
+                    jk.toString(),
+                    jd.toString(),
+                    ja.toString(),
+                    jkda.toString(),
+                    'Loss'
+                  ]);
                 }
               }
             }
           }
         }
 
-        for (var rowData in tableData) {
-          List<Widget> cells = [];
-          for (var cellData in rowData) {
-            cells.add(
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(cellData),
-              ),
-            );
-          }
-          matchtableRows.add(
-            TableRow(
-              children: cells,
+      for (var rowData in tableData) {
+        List<Widget> cells = [];
+        for (var cellData in rowData) {
+          cells.add(
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(cellData),
             ),
           );
         }
+
+        TableRow row = TableRow(children: cells);
+
+        if(!rowData.contains("Win") && !rowData.contains("Loss")){
+          row = TableRow(
+            children: row.children.map((widget) {
+              return Container(
+                child: widget,
+              );
+            }).toList(),
+          );
+        }else if(rowData.contains("Win") ){
+          row = TableRow(
+            children: row.children.map((widget) {
+              return Container(
+                color: Colors.green[300],
+                child: widget,
+              );
+            }).toList(),
+          );
+        }else if(rowData.contains("Loss")){
+          row = TableRow(
+            children: row.children.map((widget) {
+              return Container(
+                color: Colors.red[300],
+                child: widget,
+              );
+            }).toList(),
+          );
+        }
+
+        matchtableRows.add(row);
+      }
+
+
 
         setState(() {});
       } else {
