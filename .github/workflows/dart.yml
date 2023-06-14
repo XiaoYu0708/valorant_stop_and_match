@@ -19,4 +19,4 @@ jobs:
     - run: flutter pub get
     - run: dart pub get
     - run: dart format -o show lib/main.dart
-    - run: flutter run --release
+    - run: flutter run --release -d chrome
