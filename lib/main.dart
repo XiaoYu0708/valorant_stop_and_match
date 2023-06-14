@@ -157,8 +157,8 @@ class _MyAppState extends State<MyApp> {
         String myteam = '';
 
         List<List<String>> tableData = [
-          ['地圖', '模式', 'K', 'D', 'A', 'KDA', '勝敗']
-        ]; //地圖,模式,K,D,A,KDA,勝敗
+          ['地圖', '模式', 'K', 'D', 'A', 'KD', '勝敗']
+        ]; //地圖,模式,K,D,A,KD,勝敗
 
         for (var i = 0; i < jsonData['data'].length; i++) {
           for (var j = 0; j <
