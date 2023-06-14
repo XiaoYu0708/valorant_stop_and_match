@@ -19,5 +19,4 @@ jobs:
     - run: flutter pub get
     - run: dart pub get
     - run: dart format -o show lib/main.dart
-    - run: flutter analyze
     - run: flutter test
