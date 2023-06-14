@@ -120,6 +120,7 @@ class _MyAppState extends State<MyApp> {
                   3: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
                   4: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
                   5: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
+                  6: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
                 },
                 border: TableBorder.all(),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -156,7 +157,7 @@ class _MyAppState extends State<MyApp> {
         String myteam = '';
         String rt = '';
 
-        List<List<String>> tableData = [['地圖','模式','K','D','A','勝敗']]; //地圖,模式,K,D,A,勝敗
+        List<List<String>> tableData = [['地圖','模式','K','D','A','KDA','勝敗']]; //地圖,模式,K,D,A,KDA,勝敗
 
         for(var i = 0;i<jsonData['data'].length;i++) {
           for (var j = 0; j <
@@ -218,16 +219,24 @@ class _MyAppState extends State<MyApp> {
             jmap = zh_TW_map[en_US_map.indexOf(jmap)];
             jmode = zh_TW_mode[en_US_mode.indexOf(jmode)];
 
+            String? jkda = '';
+
+            if(jd == 0){
+              jkda = (((jk+ja)).toStringAsFixed(1));
+            }else{
+              jkda = (((jk+ja)/jd).toStringAsFixed(1));
+            }
+
             if (jname.toString() == gameName && jtag.toString() == tagLine) {
               if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
-                tableData.add([jmap, jmode, jk.toString(), jd.toString(),ja.toString(),'']);
+                tableData.add([jmap, jmode, jk.toString(), jd.toString(),ja.toString(),jkda.toString(),'']);
               } else {
                 myteam = jsonData['data'][i]['players']['all_players'][j]['team'];
                 myteam = myteam.toLowerCase();
                 if (jsonData['data'][i]['teams'][myteam]['has_won'] == true) {
-                  tableData.add([jmap, jmode, jk.toString(), jd.toString(),ja.toString(),'Win']);
+                  tableData.add([jmap, jmode, jk.toString(), jd.toString(),ja.toString(),jkda.toString(),'Win']);
                 } else {
-                  tableData.add([jmap, jmode, jk.toString(), jd.toString(),ja.toString(),'Loss']);
+                  tableData.add([jmap, jmode, jk.toString(), jd.toString(),ja.toString(),jkda.toString(),'Loss']);
                 }
               }
             }
