@@ -325,7 +325,6 @@ class _MyAppState extends State<MyApp> {
           }
         }
 
-
         setState(() {});
       } else {
         print('Request failed with status: ${response.statusCode}');
