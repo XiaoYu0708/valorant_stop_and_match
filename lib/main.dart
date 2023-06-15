@@ -121,6 +121,7 @@ class _MyAppState extends State<MyApp> {
                   4: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
                   5: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
                   6: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
+                  7: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
                 },
                 border: TableBorder.all(color: Colors.transparent),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -157,32 +158,31 @@ class _MyAppState extends State<MyApp> {
         String myteam = '';
 
         List<List<String>> tableData = [
-          ['地圖', '模式', 'K', 'D', 'A', 'KD', '勝敗']
-        ]; //地圖,模式,K,D,A,KD,勝敗
+          ['特務','地圖', '模式', 'K', 'D', 'A', 'KD', '勝敗']
+        ]; //特務,地圖,模式,K,D,A,KD,勝敗
 
         for (var i = 0; i < jsonData['data'].length; i++) {
-          for (var j = 0; j <
-              jsonData['data'][i]['players']['all_players'].length; j++) {
-            String jmap = jsonData['data'][i]['metadata']['map'];
-            String jname = jsonData['data'][i]['players']['all_players'][j]['name'];
-            String jtag = jsonData['data'][i]['players']['all_players'][j]['tag'];
-            String jmode = jsonData['data'][i]['metadata']['mode'];
+          for (var j = 0; j < jsonData['data'][i]['players']['all_players'].length; j++) {
+            String? jmap = jsonData['data'][i]['metadata']['map'];
+            String? jpuuid = jsonData['data'][i]['players']['all_players'][j]['puuid'];
+            String? jmode = jsonData['data'][i]['metadata']['mode'];
+            String? jagentimg = jsonData['data'][i]['players']['all_players'][j]['assets']['agent']['small'];
             int jk = jsonData['data'][i]['players']['all_players'][j]['stats']['kills'];
             int jd = jsonData['data'][i]['players']['all_players'][j]['stats']['deaths'];
             int ja = jsonData['data'][i]['players']['all_players'][j]['stats']['assists'];
 
-            List<String> en_US_map = [
-              "Bind",
-              "Haven",
-              "Split",
-              "Ascent",
-              "Icebox",
-              "Breeze",
-              "Fracture",
-              "Pearl",
-              "Lotus"
+            List<String> enUsMap = [
+              "bind",
+              "haven",
+              "split",
+              "ascent",
+              "icebox",
+              "breeze",
+              "fracture",
+              "pearl",
+              "lotus"
             ];
-            List<String> zh_TW_map = [
+            List<String> zhTwMap = [
               "劫境之地",
               "遺落境地",
               "雙塔迷城",
@@ -194,18 +194,18 @@ class _MyAppState extends State<MyApp> {
               "蓮華古城"
             ];
 
-            List<String> en_US_mode = [
-              "Unrated",
-              "Competitive",
-              "Spikerush",
-              "Deathmatch",
-              "Escalation",
-              "Replication",
-              "Snowballfight",
-              "Swiftplay",
-              "Customgame"
+            List<String> enUsMode = [
+              "unrated",
+              "competitive",
+              "spike rush",
+              "deathmatch",
+              "escalation",
+              "replication",
+              "snowballfight",
+              "swiftplay",
+              "custom game"
             ];
-            List<String> zh_TW_mode = [
+            List<String> zhTwMode = [
               "一般模式",
               "競技模式",
               "輻能搶攻戰",
@@ -217,22 +217,25 @@ class _MyAppState extends State<MyApp> {
               "自訂模式"
             ];
 
-            jmap = zh_TW_map[en_US_map.indexOf(jmap)];
-            jmode = zh_TW_mode[en_US_mode.indexOf(jmode)];
+            print(jmap);
+
+            jmap = zhTwMap[enUsMap.indexOf(jmap.toString().toLowerCase())];
+            jmode = zhTwMode[enUsMode.indexOf(jmode.toString().toLowerCase())];
 
             String? jkda = '';
 
             if (jd == 0) {
-              jkda = ((jk).toStringAsFixed(1));
+              jkda = ((jk.toInt()).toStringAsFixed(1));
             } else {
               jkda = ((jk / jd).toStringAsFixed(1));
             }
 
-            if (jname.toString() == gameName && jtag.toString() == tagLine) {
+            if (puuid.toString() == jpuuid.toString()) {
               if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
                 tableData.add([
-                  jmap,
-                  jmode,
+                  jagentimg.toString(),
+                  jmap.toString(),
+                  jmode.toString(),
                   jk.toString(),
                   jd.toString(),
                   ja.toString(),
@@ -245,8 +248,9 @@ class _MyAppState extends State<MyApp> {
                 myteam = myteam.toLowerCase();
                 if (jsonData['data'][i]['teams'][myteam]['has_won'] == true) {
                   tableData.add([
-                    jmap,
-                    jmode,
+                    jagentimg.toString(),
+                    jmap.toString(),
+                    jmode.toString(),
                     jk.toString(),
                     jd.toString(),
                     ja.toString(),
@@ -255,8 +259,9 @@ class _MyAppState extends State<MyApp> {
                   ]);
                 } else {
                   tableData.add([
-                    jmap,
-                    jmode,
+                    jagentimg.toString(),
+                    jmap.toString(),
+                    jmode.toString(),
                     jk.toString(),
                     jd.toString(),
                     ja.toString(),
@@ -272,42 +277,54 @@ class _MyAppState extends State<MyApp> {
         for (var rowData in tableData) {
           List<Widget> cells = [];
           for (var cellData in rowData) {
-            cells.add(
-              Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(cellData),
-              ),
-            );
+            if (cellData is String && cellData.startsWith('http')) {
+              cells.add(
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Image.network(
+                    cellData,
+                    width: 30.0,
+                    height: 30.0,
+                  ),
+                ),
+              );
+            } else {
+              cells.add(
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(cellData),
+                ),
+              );
+            }
           }
 
-          if(!rowData.contains("Win") && !rowData.contains("Loss")){
+          if (!rowData.contains("Win") && !rowData.contains("Loss")) {
             matchtableRows.add(
               TableRow(
                 children: cells,
               ),
             );
-          }else if(rowData.contains("Win") ){
+          } else if (rowData.contains("Win")) {
             matchtableRows.add(
               TableRow(
                 decoration: BoxDecoration(
-                  color: Colors.green[400],
+                  color: Colors.green[300],
                 ),
                 children: cells,
               ),
             );
-          }else if(rowData.contains("Loss")){
+          } else if (rowData.contains("Loss")) {
             matchtableRows.add(
               TableRow(
                 decoration: BoxDecoration(
-                  color: Colors.red[400],
+                  color: Colors.red[300],
                 ),
                 children: cells,
               ),
             );
           }
-
-
         }
+
 
         setState(() {});
       } else {
@@ -333,11 +350,13 @@ class _MyAppState extends State<MyApp> {
 
         String? currenttierpatched = jsonData['data']['currenttierpatched'];
         String? smallCardImageUrl = jsonData['data']['images']?['small'];
-        int? ranking_in_tier = jsonData['data']['ranking_in_tier'];
+        int? rankingInTier = jsonData['data']['ranking_in_tier'];
 
         playerrankImageUrl = smallCardImageUrl.toString();
 
-        return '牌位：${currenttierpatched.toString()}\n競技分數：${ranking_in_tier.toString()}';
+        rankingInTier ??= 0;
+
+        return '牌位：${currenttierpatched.toString()}\n競技分數：${rankingInTier.toString()}';
 
       } else {
         print('Request failed with status: ${response.statusCode}');
@@ -353,13 +372,15 @@ class _MyAppState extends State<MyApp> {
     try {
       setState(() {
         isButtonDisabled = true;
-        playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
-        playerrankImageUrl = 'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
+        playersmallCardImageUrl =
+        'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
+        playerrankImageUrl =
+        'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
         play_im_data = "請先輸入玩家資訊";
         matchtableRows.clear();
       });
 
-      if(gameNameedit.text == "" || tagLineedit.text == ""){
+      if (gameNameedit.text == "" || tagLineedit.text == "") {
         toast("請先輸入玩家資訊");
         setState(() {
           isButtonDisabled = false;
@@ -372,7 +393,9 @@ class _MyAppState extends State<MyApp> {
       gameName = gameNameedit.text;
       tagLine = tagLineedit.text;
 
-      final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v1/account/${gameName.toString()}/${tagLine.toString()}?force=true'));
+      final response = await http.get(Uri.parse(
+          'https://api.henrikdev.xyz/valorant/v1/account/${gameName
+              .toString()}/${tagLine.toString()}?force=true'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
@@ -395,12 +418,18 @@ class _MyAppState extends State<MyApp> {
 
         getplayer_match_history();
 
-        play_im_data = '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}\n${mmr.toString()}';
+        play_im_data =
+        '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag
+            .toString()}\n等級：${accountLevel.toString()}\n${mmr.toString()}';
         playersmallCardImageUrl = smallCardImageUrl.toString();
 
         toast("驗證成功");
-      } else {
+      }else if(response.statusCode == 404) {
         toast("錯誤!找不到該玩家");
+        setState(() {
+          isButtonDisabled = false;
+        });
+      }else {
         print('Request failed with status: ${response.statusCode}');
         setState(() {
           isButtonDisabled = false;
