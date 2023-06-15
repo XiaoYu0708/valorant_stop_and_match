@@ -400,18 +400,15 @@ class _MyAppState extends State<MyApp> {
         playersmallCardImageUrl = smallCardImageUrl.toString();
 
         toast("驗證成功");
-      }else if(response.statusCode == 404) {
-        toast("錯誤!找不到該玩家");
-        setState(() {
-          isButtonDisabled = false;
-        });
       }else {
+        toast("錯誤!找不到該玩家");
         print('Request failed with status: ${response.statusCode}');
         setState(() {
           isButtonDisabled = false;
         });
       }
     } catch (error) {
+      toast("抓取玩家資料錯誤");
       print('Error: $error');
       setState(() {
         isButtonDisabled = false;
