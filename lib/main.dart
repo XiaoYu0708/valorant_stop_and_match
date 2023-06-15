@@ -10,9 +10,9 @@ void main() {
   ));
 }
 
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
@@ -23,6 +23,29 @@ String tagLine = "";  //PlayerTag
 String apikey = 'RGAPI-2cf9ca1a-96b5-45a8-8b28-8ee44a7f81a5'; //Dev ApiKey
 String puuid = '';  //player puuid
 
+Map<String,String> map = {
+  "bind":"劫境之地",
+  "haven":"遺落境地",
+  "split":"雙塔迷城",
+  "ascent":"義境空島",
+  "icebox":"極地寒港",
+  "breeze":"熱帶樂園",
+  "fracture":"天漠之峽",
+  "pearl":"深海遺珠",
+  "lotus":"蓮華古城",
+};
+
+Map<String,String> mode = {
+  "unrated":"一般模式",
+  "competitive":"競技模式",
+  "spike rush":"輻能搶攻戰",
+  "deathmatch":"死鬥模式",
+  "escalation":"超激進戰",
+  "replication":"複製亂戰",
+  "snowballfight":"打雪仗",
+  "swiftplay":"超速衝點",
+  "custom game":"自訂模式",
+};
 class _MyAppState extends State<MyApp> {
   TextEditingController gameNameedit = TextEditingController();
   TextEditingController tagLineedit = TextEditingController();
@@ -134,7 +157,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-
   void toast(msg){
     Fluttertoast.cancel();
     Fluttertoast.showToast(
@@ -171,56 +193,8 @@ class _MyAppState extends State<MyApp> {
             int jd = jsonData['data'][i]['players']['all_players'][j]['stats']['deaths'];
             int ja = jsonData['data'][i]['players']['all_players'][j]['stats']['assists'];
 
-            List<String> enUsMap = [
-              "bind",
-              "haven",
-              "split",
-              "ascent",
-              "icebox",
-              "breeze",
-              "fracture",
-              "pearl",
-              "lotus"
-            ];
-            List<String> zhTwMap = [
-              "劫境之地",
-              "遺落境地",
-              "雙塔迷城",
-              "義境空島",
-              "極地寒港",
-              "熱帶樂園",
-              "天漠之峽",
-              "深海遺珠",
-              "蓮華古城"
-            ];
-
-            List<String> enUsMode = [
-              "unrated",
-              "competitive",
-              "spike rush",
-              "deathmatch",
-              "escalation",
-              "replication",
-              "snowballfight",
-              "swiftplay",
-              "custom game"
-            ];
-            List<String> zhTwMode = [
-              "一般模式",
-              "競技模式",
-              "輻能搶攻戰",
-              "死鬥模式",
-              "超激進戰",
-              "複製亂戰",
-              "打雪仗",
-              "超速衝點",
-              "自訂模式"
-            ];
-
-            print(jmap);
-
-            jmap = zhTwMap[enUsMap.indexOf(jmap.toString().toLowerCase())];
-            jmode = zhTwMode[enUsMode.indexOf(jmode.toString().toLowerCase())];
+            jmap = map[jmap.toString().toLowerCase()];
+            jmode = mode[jmode.toString().toLowerCase()];
 
             String? jkda = '';
 
@@ -281,10 +255,12 @@ class _MyAppState extends State<MyApp> {
               cells.add(
                 Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Image.network(
-                    cellData,
-                    width: 30.0,
-                    height: 30.0,
+                  child: Center(
+                    child: Image.network(
+                      cellData,
+                      width: 30.0,
+                      height: 30.0,
+                    ),
                   ),
                 ),
               );
@@ -292,7 +268,9 @@ class _MyAppState extends State<MyApp> {
               cells.add(
                 Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text(cellData),
+                  child: Center(
+                    child: Text(cellData),
+                  ),
                 ),
               );
             }
@@ -324,12 +302,11 @@ class _MyAppState extends State<MyApp> {
             );
           }
         }
-
+        toast("資料更新完成");
         setState(() {});
       } else {
         print('Request failed with status: ${response.statusCode}');
       }
-      toast("資料更新完成");
     } catch (error) {
       print('Error: $error');
       toast("抓取玩家歷史戰績錯誤");
