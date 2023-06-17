@@ -5,12 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 
 void main() {
-  runApp(const MaterialApp(
-    home: MyApp()
-  ));
+  runApp(const MaterialApp(home: MyApp()));
 }
-
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
   @override
@@ -18,34 +14,35 @@ class MyApp extends StatefulWidget {
 }
 
 String gameName = ""; //PlayerName
-String tagLine = "";  //PlayerTag
+String tagLine = ""; //PlayerTag
 
 String apikey = 'RGAPI-2cf9ca1a-96b5-45a8-8b28-8ee44a7f81a5'; //Dev ApiKey
-String puuid = '';  //player puuid
+String puuid = ''; //player puuid
 
-Map<String,String> map = {
-  "bind":"劫境之地",
-  "haven":"遺落境地",
-  "split":"雙塔迷城",
-  "ascent":"義境空島",
-  "icebox":"極地寒港",
-  "breeze":"熱帶樂園",
-  "fracture":"天漠之峽",
-  "pearl":"深海遺珠",
-  "lotus":"蓮華古城",
+Map<String, String> map = {
+  "bind": "劫境之地",
+  "haven": "遺落境地",
+  "split": "雙塔迷城",
+  "ascent": "義境空島",
+  "icebox": "極地寒港",
+  "breeze": "熱帶樂園",
+  "fracture": "天漠之峽",
+  "pearl": "深海遺珠",
+  "lotus": "蓮華古城",
 };
 
-Map<String,String> mode = {
-  "unrated":"一般模式",
-  "competitive":"競技模式",
-  "spike rush":"輻能搶攻戰",
-  "deathmatch":"死鬥模式",
-  "escalation":"超激進戰",
-  "replication":"複製亂戰",
-  "snowballfight":"打雪仗",
-  "swiftplay":"超速衝點",
-  "custom game":"自訂模式",
+Map<String, String> mode = {
+  "unrated": "一般模式",
+  "competitive": "競技模式",
+  "spike rush": "輻能搶攻戰",
+  "deathmatch": "死鬥模式",
+  "escalation": "超激進戰",
+  "replication": "複製亂戰",
+  "snowballfight": "打雪仗",
+  "swiftplay": "超速衝點",
+  "custom game": "自訂模式",
 };
+
 class _MyAppState extends State<MyApp> {
   TextEditingController gameNameedit = TextEditingController();
   TextEditingController tagLineedit = TextEditingController();
@@ -57,8 +54,10 @@ class _MyAppState extends State<MyApp> {
   String? puuid = '';
   String city = '';
   String response = '';
-  String playersmallCardImageUrl = 'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
-  String playerrankImageUrl = 'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
+  String playersmallCardImageUrl =
+      'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
+  String playerrankImageUrl =
+      'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
 
   List<TableRow> matchtableRows = [];
 
@@ -74,9 +73,9 @@ class _MyAppState extends State<MyApp> {
         // Define the default `TextTheme`. Use this to specify the default
         // text styling for headlines, titles, bodies of text, and more.
         textTheme: const TextTheme(
-        displayLarge: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-        titleLarge: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
-        bodyMedium: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+          displayLarge: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+          titleLarge: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+          bodyMedium: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
         ),
       ),
       home: Scaffold(
@@ -104,9 +103,11 @@ class _MyAppState extends State<MyApp> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red[900],
                   ),
-                  onPressed: isButtonDisabled ? null : () {
-                    buttonclick_getplayer_im();
-                  },
+                  onPressed: isButtonDisabled
+                      ? null
+                      : () {
+                          buttonclick_getplayer_im();
+                        },
                   child: const Text("取得玩家資訊"),
                 ),
               ),
@@ -137,14 +138,14 @@ class _MyAppState extends State<MyApp> {
               ),
               Table(
                 columnWidths: const {
-                  0: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
-                  1: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
-                  2: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
-                  3: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
-                  4: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
-                  5: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
-                  6: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
-                  7: IntrinsicColumnWidth(),  // 列寬度設定為自動調整
+                  0: IntrinsicColumnWidth(), // 列寬度設定為自動調整
+                  1: IntrinsicColumnWidth(), // 列寬度設定為自動調整
+                  2: IntrinsicColumnWidth(), // 列寬度設定為自動調整
+                  3: IntrinsicColumnWidth(), // 列寬度設定為自動調整
+                  4: IntrinsicColumnWidth(), // 列寬度設定為自動調整
+                  5: IntrinsicColumnWidth(), // 列寬度設定為自動調整
+                  6: IntrinsicColumnWidth(), // 列寬度設定為自動調整
+                  7: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                 },
                 border: TableBorder.all(color: Colors.transparent),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -157,7 +158,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void toast(msg){
+  void toast(msg) {
     Fluttertoast.cancel();
     Fluttertoast.showToast(
         msg: msg,
@@ -166,13 +167,14 @@ class _MyAppState extends State<MyApp> {
         timeInSecForIosWeb: 1,
         backgroundColor: Colors.red,
         textColor: Colors.white,
-        fontSize: 16.0
-    );
+        fontSize: 16.0);
   }
 
-   void getplayer_match_history() async {  //抓取玩家歷史戰績
+  void getplayer_match_history() async {
+    //抓取玩家歷史戰績
     try {
-      final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v3/by-puuid/matches/${city.toString()}/${puuid.toString()}?size=10'));
+      final response = await http.get(Uri.parse(
+          'https://api.henrikdev.xyz/valorant/v3/by-puuid/matches/${city.toString()}/${puuid.toString()}?size=10'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
@@ -180,18 +182,25 @@ class _MyAppState extends State<MyApp> {
         String myteam = '';
 
         List<List<String>> tableData = [
-          ['特務','地圖', '模式', 'K', 'D', 'A', 'KD', '勝敗']
+          ['特務', '地圖', '模式', 'K', 'D', 'A', 'KD', '勝敗']
         ]; //特務,地圖,模式,K,D,A,KD,勝敗
 
         for (var i = 0; i < jsonData['data'].length; i++) {
-          for (var j = 0; j < jsonData['data'][i]['players']['all_players'].length; j++) {
+          for (var j = 0;
+              j < jsonData['data'][i]['players']['all_players'].length;
+              j++) {
             String? jmap = jsonData['data'][i]['metadata']['map'];
-            String? jpuuid = jsonData['data'][i]['players']['all_players'][j]['puuid'];
+            String? jpuuid =
+                jsonData['data'][i]['players']['all_players'][j]['puuid'];
             String? jmode = jsonData['data'][i]['metadata']['mode'];
-            String? jagentimg = jsonData['data'][i]['players']['all_players'][j]['assets']['agent']['small'];
-            int jk = jsonData['data'][i]['players']['all_players'][j]['stats']['kills'];
-            int jd = jsonData['data'][i]['players']['all_players'][j]['stats']['deaths'];
-            int ja = jsonData['data'][i]['players']['all_players'][j]['stats']['assists'];
+            String? jagentimg = jsonData['data'][i]['players']['all_players'][j]
+                ['assets']['agent']['small'];
+            int jk = jsonData['data'][i]['players']['all_players'][j]['stats']
+                ['kills'];
+            int jd = jsonData['data'][i]['players']['all_players'][j]['stats']
+                ['deaths'];
+            int ja = jsonData['data'][i]['players']['all_players'][j]['stats']
+                ['assists'];
 
             jmap = map[jmap.toString().toLowerCase()];
             jmode = mode[jmode.toString().toLowerCase()];
@@ -218,7 +227,7 @@ class _MyAppState extends State<MyApp> {
                 ]);
               } else {
                 myteam =
-                jsonData['data'][i]['players']['all_players'][j]['team'];
+                    jsonData['data'][i]['players']['all_players'][j]['team'];
                 myteam = myteam.toLowerCase();
                 if (jsonData['data'][i]['teams'][myteam]['has_won'] == true) {
                   tableData.add([
@@ -251,10 +260,10 @@ class _MyAppState extends State<MyApp> {
         for (var rowData in tableData) {
           List<Widget> cells = [];
           for (var cellData in rowData) {
-            if (cellData is String && cellData.startsWith('http')) {
+            if (cellData.startsWith('http')) {
               cells.add(
                 Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Center(
                     child: Image.network(
                       cellData,
@@ -267,7 +276,7 @@ class _MyAppState extends State<MyApp> {
             } else {
               cells.add(
                 Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Center(
                     child: Text(cellData),
                   ),
@@ -310,16 +319,18 @@ class _MyAppState extends State<MyApp> {
     } catch (error) {
       print('Error: $error');
       toast("抓取玩家歷史戰績錯誤");
-    }finally{
+    } finally {
       setState(() {
         isButtonDisabled = false;
       });
     }
   }
 
-  Future<String> getplayer_mmr() async {  //抓取玩家牌位
+  Future<String> getplayer_mmr() async {
+    //抓取玩家牌位
     try {
-      final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v1/mmr/${city.toString()}/${gameName.toString()}/${tagLine.toString()}'));
+      final response = await http.get(Uri.parse(
+          'https://api.henrikdev.xyz/valorant/v1/mmr/${city.toString()}/${gameName.toString()}/${tagLine.toString()}'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
@@ -333,7 +344,6 @@ class _MyAppState extends State<MyApp> {
         rankingInTier ??= 0;
 
         return '牌位：${currenttierpatched.toString()}\n競技分數：${rankingInTier.toString()}';
-
       } else {
         print('Request failed with status: ${response.statusCode}');
         return "Request failed with status: ${response.statusCode}";
@@ -349,9 +359,9 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         isButtonDisabled = true;
         playersmallCardImageUrl =
-        'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
+            'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
         playerrankImageUrl =
-        'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
+            'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
         play_im_data = "請先輸入玩家資訊";
         matchtableRows.clear();
       });
@@ -370,8 +380,7 @@ class _MyAppState extends State<MyApp> {
       tagLine = tagLineedit.text;
 
       final response = await http.get(Uri.parse(
-          'https://api.henrikdev.xyz/valorant/v1/account/${gameName
-              .toString()}/${tagLine.toString()}?force=true'));
+          'https://api.henrikdev.xyz/valorant/v1/account/${gameName.toString()}/${tagLine.toString()}?force=true'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
@@ -395,12 +404,11 @@ class _MyAppState extends State<MyApp> {
         getplayer_match_history();
 
         play_im_data =
-        '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag
-            .toString()}\n等級：${accountLevel.toString()}\n${mmr.toString()}';
+            '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}\n${mmr.toString()}';
         playersmallCardImageUrl = smallCardImageUrl.toString();
 
         toast("驗證成功");
-      }else {
+      } else {
         toast("錯誤!找不到該玩家");
         print('Request failed with status: ${response.statusCode}');
         setState(() {
