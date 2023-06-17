@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 void main() {
   runApp(const MaterialApp(home: MyApp()));
 }
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
   @override
