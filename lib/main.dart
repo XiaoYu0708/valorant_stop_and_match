@@ -86,7 +86,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Container(
           alignment: Alignment.centerLeft,
-          margin: const EdgeInsets.all(20),
+          margin: const EdgeInsets.all(10),
           child: ListView(
             children: [
               TextField(
@@ -147,7 +147,6 @@ class _MyAppState extends State<MyApp> {
                   5: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                   6: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                   7: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  8: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                 },
                 border: TableBorder.all(color: Colors.transparent),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -184,7 +183,7 @@ class _MyAppState extends State<MyApp> {
         String myteam = '';
 
         List<List<String>> tableData = [
-          ['特務', '地圖', '模式', '比數', 'K', 'D', 'A', 'KD', '勝敗']
+          ['特務', '地圖', '模式', '比數', 'K', 'D', 'A', '勝敗']
         ]; //特務,地圖,模式,比數,K,D,A,KD,勝敗
 
         for (var i = 0; i < jsonData['data'].length; i++) {
@@ -207,14 +206,6 @@ class _MyAppState extends State<MyApp> {
             jmap = map[jmap.toString().toLowerCase()];
             jmode = mode[jmode.toString().toLowerCase()];
 
-            String? jkda = '';
-
-            if (jd == 0) {
-              jkda = ((jk.toInt()).toStringAsFixed(1));
-            } else {
-              jkda = ((jk / jd).toStringAsFixed(1));
-            }
-
             if (puuid.toString() == jpuuid.toString()) {
               if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
                 List<int> playerskills = [];
@@ -234,7 +225,6 @@ class _MyAppState extends State<MyApp> {
                   jk.toString(),
                   jd.toString(),
                   ja.toString(),
-                  jkda.toString(),
                   '',
                 ]);
               } else {
@@ -258,7 +248,6 @@ class _MyAppState extends State<MyApp> {
                   jk.toString(),
                   jd.toString(),
                   ja.toString(),
-                  jkda.toString(),
                   elsmodewinloss.toString(),
                 ]);
               }
