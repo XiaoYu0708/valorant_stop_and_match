@@ -147,6 +147,7 @@ class _MyAppState extends State<MyApp> {
                   5: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                   6: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                   7: IntrinsicColumnWidth(), // 列寬度設定為自動調整
+                  8: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                 },
                 border: TableBorder.all(color: Colors.transparent),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -183,8 +184,8 @@ class _MyAppState extends State<MyApp> {
         String myteam = '';
 
         List<List<String>> tableData = [
-          ['特務', '地圖', '模式', 'K', 'D', 'A', 'KD', '勝敗']
-        ]; //特務,地圖,模式,K,D,A,KD,勝敗
+          ['特務', '地圖', '模式', '比數', 'K', 'D', 'A', 'KD', '勝敗']
+        ]; //特務,地圖,模式,比數,K,D,A,KD,勝敗
 
         for (var i = 0; i < jsonData['data'].length; i++) {
           for (var j = 0;
@@ -216,43 +217,50 @@ class _MyAppState extends State<MyApp> {
 
             if (puuid.toString() == jpuuid.toString()) {
               if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
+                List<int> playerskills = [];
+
+                for(int ts=0;ts < jsonData['data'][i]['players']['all_players'].length;ts++){
+                  playerskills.add(jsonData['data'][i]['players']['all_players'][ts]['stats']['kills']);
+                }
+
+                int? matchmaxkills = playerskills.reduce((value, element) => value > element ? value : element);
+                String? myteamscore = '${matchmaxkills.toString()}：${jk.toString()}';
+
                 tableData.add([
                   jagentimg.toString(),
                   jmap.toString(),
                   jmode.toString(),
+                  myteamscore.toString(),
                   jk.toString(),
                   jd.toString(),
                   ja.toString(),
                   jkda.toString(),
-                  ''
+                  '',
                 ]);
               } else {
                 myteam =
                     jsonData['data'][i]['players']['all_players'][j]['team'];
                 myteam = myteam.toLowerCase();
+                String? myteamscore = '${jsonData['data'][i]['teams'][myteam]['rounds_won']}：${jsonData['data'][i]['teams'][myteam]['rounds_lost']}';
+                String? elsmodewinloss = '';
+
                 if (jsonData['data'][i]['teams'][myteam]['has_won'] == true) {
-                  tableData.add([
-                    jagentimg.toString(),
-                    jmap.toString(),
-                    jmode.toString(),
-                    jk.toString(),
-                    jd.toString(),
-                    ja.toString(),
-                    jkda.toString(),
-                    'Win'
-                  ]);
-                } else {
-                  tableData.add([
-                    jagentimg.toString(),
-                    jmap.toString(),
-                    jmode.toString(),
-                    jk.toString(),
-                    jd.toString(),
-                    ja.toString(),
-                    jkda.toString(),
-                    'Loss'
-                  ]);
+                  elsmodewinloss = 'Win';
+                }else{
+                  elsmodewinloss = 'Loss';
                 }
+
+                tableData.add([
+                  jagentimg.toString(),
+                  jmap.toString(),
+                  jmode.toString(),
+                  myteamscore.toString(),
+                  jk.toString(),
+                  jd.toString(),
+                  ja.toString(),
+                  jkda.toString(),
+                  elsmodewinloss.toString(),
+                ]);
               }
             }
           }
@@ -286,13 +294,22 @@ class _MyAppState extends State<MyApp> {
             }
           }
 
-          if (!rowData.contains("Win") && !rowData.contains("Loss")) {
+          if (!rowData.contains("Win") && !rowData.contains("Loss") && !rowData.contains("死鬥模式")) {
             matchtableRows.add(
               TableRow(
                 children: cells,
               ),
             );
-          } else if (rowData.contains("Win")) {
+          }else if(rowData.contains("死鬥模式")){
+            matchtableRows.add(
+              TableRow(
+                decoration: BoxDecoration(
+                  color: Colors.green[200],
+                ),
+                children: cells,
+              ),
+            );
+          }else if (rowData.contains("Win")) {
             matchtableRows.add(
               TableRow(
                 decoration: BoxDecoration(
