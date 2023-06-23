@@ -132,7 +132,6 @@ class _matchdtlState extends State<matchdtl> {
             }
           });
         }
-
         for (var j = 0;
         j < jsonData['data'][i]['players']['all_players'].length;
         j++) {

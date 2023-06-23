@@ -394,7 +394,6 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
 
       final response = await http.get(Uri.parse(
           'https://api.henrikdev.xyz/valorant/v1/account/${gameName.toString()}/${tagLine.toString()}?force=true'));
-
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
 

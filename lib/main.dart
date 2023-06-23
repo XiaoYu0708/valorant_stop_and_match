@@ -16,7 +16,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   TextEditingController gameNameedit = TextEditingController();
   TextEditingController tagLineedit = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
