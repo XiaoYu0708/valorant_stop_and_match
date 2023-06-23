@@ -92,7 +92,7 @@ class _matchdtlState extends State<matchdtl> {
                 columnWidths: const {
                   0: IntrinsicColumnWidth(),
                   1: IntrinsicColumnWidth(),
-                  2: FixedColumnWidth(120),
+                  2: FixedColumnWidth(100),
                   3: IntrinsicColumnWidth(),
                   4: IntrinsicColumnWidth(),
                   5: IntrinsicColumnWidth(),
