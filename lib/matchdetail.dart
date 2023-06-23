@@ -244,7 +244,6 @@ class _matchdtlState extends State<matchdtl> {
                   color: Colors.blue[300],
                 ),
                 children: cells.map((Widget cell) {
-                  int index = tableData.indexOf(rowData) - 1;
                   return InkWell(
                     onTap: () {
                       Navigator.push(
@@ -267,7 +266,6 @@ class _matchdtlState extends State<matchdtl> {
                   color: Colors.red[300],
                 ),
                 children: cells.map((Widget cell) {
-                  int index = tableData.indexOf(rowData) - 1;
                   return InkWell(
                     onTap: () {
                       Navigator.push(
@@ -282,7 +280,28 @@ class _matchdtlState extends State<matchdtl> {
                 }).toList(),
               ),
             );
-          }else{
+          }else if(tableData.indexOf(rowData) != 0){
+            matchtableRows.add(
+              TableRow(
+                decoration: BoxDecoration(
+                  color: Colors.grey[600],
+                ),
+                children: cells.map((Widget cell) {
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => playerdt(gameNameedit: rowData[2],tagLineedit:rowData[3]),
+                        ),
+                      );
+                    },
+                    child: cell,
+                  );
+                }).toList(),
+              ),
+            );
+          } else{
             matchtableRows.add(
               TableRow(
                 children: cells,
