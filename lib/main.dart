@@ -1,9 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:Valorant_Match/matchdetail.dart';
 import 'package:Valorant_Match/playerdetail.dart';
 
 void main() {

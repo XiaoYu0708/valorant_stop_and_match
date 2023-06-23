@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'matchdetail.dart';
+import 'package:Valorant_Match/dhn.dart';
 
 class playerdt extends StatefulWidget {
   final String gameNameedit;
@@ -22,32 +23,7 @@ class playerdt extends StatefulWidget {
 String gameName = ""; //PlayerName
 String tagLine = ""; //PlayerTag
 
-String apikey = 'RGAPI-2cf9ca1a-96b5-45a8-8b28-8ee44a7f81a5'; //Dev ApiKey
 String puuid = ''; //player puuid
-
-Map<String, String> map = {
-  "bind": "劫境之地",
-  "haven": "遺落境地",
-  "split": "雙塔迷城",
-  "ascent": "義境空島",
-  "icebox": "極地寒港",
-  "breeze": "熱帶樂園",
-  "fracture": "天漠之峽",
-  "pearl": "深海遺珠",
-  "lotus": "蓮華古城",
-};
-
-Map<String, String> mode = {
-  "unrated": "一般模式",
-  "competitive": "競技模式",
-  "spike rush": "輻能搶攻戰",
-  "deathmatch": "死鬥模式",
-  "escalation": "超激進戰",
-  "replication": "複製亂戰",
-  "snowballfight": "打雪仗",
-  "swiftplay": "超速衝點",
-  "custom game": "自訂模式",
-};
 
 class _playerdtState extends State<playerdt> {
   var play_im_data = '請先輸入玩家資訊';
