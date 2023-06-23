@@ -1,16 +1,15 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:Valorant_Match/dhn.dart';
 import 'package:Valorant_Match/playerdetail.dart';
 
-class matchdtl extends StatefulWidget {
+class Matchdtl extends StatefulWidget {
   final int index;
   final List<String> titlerowData;
   final String gameName;
   final String tagLine;
   final Map<String, dynamic> jsonData;
 
-  const matchdtl({
+  const Matchdtl({
     Key? key,
     required this.index,
     required this.titlerowData,
@@ -20,10 +19,10 @@ class matchdtl extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<matchdtl> createState() => _matchdtlState();
+  State<Matchdtl> createState() => _MatchdtlState();
 }
 
-class _matchdtlState extends State<matchdtl> {
+class _MatchdtlState extends State<Matchdtl> {
   List<TableRow> matchtableRows = [];
 
   String? gamestarttime = '';
@@ -135,8 +134,6 @@ class _matchdtlState extends State<matchdtl> {
         for (var j = 0;
         j < jsonData['data'][i]['players']['all_players'].length;
         j++) {
-          String? jmap = jsonData['data'][i]['metadata']['map'];
-          String? jmode = jsonData['data'][i]['metadata']['mode'];
           String? jagentimg = jsonData['data'][i]['players']['all_players'][j]
           ['assets']['agent']['small'];
           int jk = jsonData['data'][i]['players']['all_players'][j]['stats']
@@ -149,14 +146,6 @@ class _matchdtlState extends State<matchdtl> {
           String? jname = jsonData['data'][i]['players']['all_players'][j]['name'];
           String? jtag = jsonData['data'][i]['players']['all_players'][j]['tag'];
           String? jteam = jsonData['data'][i]['players']['all_players'][j]['team'];
-
-          if(map[jmap.toString().toLowerCase()] != null){
-            jmap = map[jmap.toString().toLowerCase()];
-          }
-
-          if(mode[jmode.toString().toLowerCase()] != null){
-            jmode = mode[jmode.toString().toLowerCase()];
-          }
 
           if(jteam != 'Red' && jteam != 'Blue'){
             jteam = '';
@@ -220,13 +209,12 @@ class _matchdtlState extends State<matchdtl> {
                   color: Colors.amberAccent[700],
                 ),
                 children: cells.map((Widget cell) {
-                  int index = tableData.indexOf(rowData) - 1;
                   return InkWell(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => playerdt(gameNameedit: rowData[2],tagLineedit:rowData[3]),
+                          builder: (context) => Playerdt(gameNameedit: rowData[2],tagLineedit:rowData[3]),
                         ),
                       );
                     },
@@ -247,7 +235,7 @@ class _matchdtlState extends State<matchdtl> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => playerdt(gameNameedit: rowData[2],tagLineedit:rowData[3]),
+                          builder: (context) => Playerdt(gameNameedit: rowData[2],tagLineedit:rowData[3]),
                         ),
                       );
                     },
@@ -269,7 +257,7 @@ class _matchdtlState extends State<matchdtl> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => playerdt(gameNameedit: rowData[2],tagLineedit:rowData[3]),
+                          builder: (context) => Playerdt(gameNameedit: rowData[2],tagLineedit:rowData[3]),
                         ),
                       );
                     },
@@ -290,7 +278,7 @@ class _matchdtlState extends State<matchdtl> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => playerdt(gameNameedit: rowData[2],tagLineedit:rowData[3]),
+                          builder: (context) => Playerdt(gameNameedit: rowData[2],tagLineedit:rowData[3]),
                         ),
                       );
                     },
@@ -306,12 +294,13 @@ class _matchdtlState extends State<matchdtl> {
 
         });
     } catch (error) {
-      print('Error: $error');
+      toast('Error: $error');
     }
   }
 
   @override
   void initState() {
+    super.initState();
     matchdtdw();
   }
 }

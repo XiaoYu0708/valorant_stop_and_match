@@ -1,21 +1,23 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'matchdetail.dart';
 import 'package:Valorant_Match/dhn.dart';
 
-class playerdt extends StatefulWidget {
+class Playerdt extends StatefulWidget {
   final String gameNameedit;
   final String tagLineedit;
 
-  const playerdt({
+  const Playerdt({
     Key? key,
     required this.gameNameedit,
     required this.tagLineedit,
   }) : super(key: key);
 
   @override
-  State<playerdt> createState() => _playerdtState();
+  State<Playerdt> createState() => _PlayerdtState();
 }
 
 String gameName = ""; //PlayerName
@@ -23,7 +25,7 @@ String tagLine = ""; //PlayerTag
 
 String puuid = ''; //player puuid
 
-class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin{
+class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin{
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -36,8 +38,7 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
   int currentIndex = 0;
   String currentText = '';
 
-  var play_im_data = '玩家資訊載入中...';
-  var jsonData;
+  String play_im_data = '玩家資訊載入中...';
 
   String? puuid = '';
   String city = '';
@@ -142,27 +143,20 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
         ]; //特務,地圖,模式,比數,K,D,A,勝敗
 
         for (var i = 0; i < jsonData['data'].length; i++) {
-          for (var j = 0;
-          j < jsonData['data'][i]['players']['all_players'].length;
-          j++) {
-            String? jmap = jsonData['data'][i]['metadata']['map'];
-            String? jpuuid =
-            jsonData['data'][i]['players']['all_players'][j]['puuid'];
-            String? jmode = jsonData['data'][i]['metadata']['mode'];
-            String? jagentimg = jsonData['data'][i]['players']['all_players'][j]
-            ['assets']['agent']['small'];
-            int jk = jsonData['data'][i]['players']['all_players'][j]['stats']
-            ['kills'];
-            int jd = jsonData['data'][i]['players']['all_players'][j]['stats']
-            ['deaths'];
-            int ja = jsonData['data'][i]['players']['all_players'][j]['stats']
-            ['assists'];
+          String? jmap = jsonData['data'][i]['metadata']['map'];
+          String? jmode = jsonData['data'][i]['metadata']['mode'];
+          for (var j = 0; j < jsonData['data'][i]['players']['all_players'].length; j++) {
+            String? jpuuid = jsonData['data'][i]['players']['all_players'][j]['puuid'];
+            String? jagentimg = jsonData['data'][i]['players']['all_players'][j]['assets']['agent']['small'];
+            int jk = jsonData['data'][i]['players']['all_players'][j]['stats']['kills'];
+            int jd = jsonData['data'][i]['players']['all_players'][j]['stats']['deaths'];
+            int ja = jsonData['data'][i]['players']['all_players'][j]['stats']['assists'];
 
-            if(map[jmap.toString().toLowerCase()]!=null){
+            if(map[jmap.toString().toLowerCase()] != null){
               jmap = map[jmap.toString().toLowerCase()];
             }
 
-            if(mode[jmode.toString().toLowerCase()]!=null){
+            if(mode[jmode.toString().toLowerCase()] != null){
               jmode = mode[jmode.toString().toLowerCase()];
             }
 
@@ -185,11 +179,9 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
                 }else if(jsonData['data'][i]['teams'][myteam]['has_won'] == false){
                   elsmodewinloss = 'Loss';
                 }
-
                 myteamscore = '${jsonData['data'][i]['teams'][myteam]['rounds_won']} : ${jsonData['data'][i]['teams'][myteam]['rounds_lost']}';
               }catch(e){
                 elsmodewinloss = '';
-
                 int? matchmaxkills = playerskills.reduce((value, element) => value > element ? value : element);
                 myteamscore = '${matchmaxkills.toString()} : ${jk.toString()}';
               }
@@ -255,7 +247,7 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                         ),
                       );
                     },
@@ -278,7 +270,7 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData,),
+                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData,),
                         ),
                       );
                     },
@@ -300,7 +292,7 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                         ),
                       );
                     },
@@ -322,7 +314,7 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                         ),
                       );
                     },
@@ -331,19 +323,36 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
                 }).toList(),
               ),
             );
+          }else{
+            TableRow(
+              children: cells.map((Widget cell) {
+                int index = tableData.indexOf(rowData) - 1;
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                      ),
+                    );
+                  },
+                  child: cell,
+                );
+              }).toList(),
+            );
           }
         }
         _controller.stop();
         currentText = '';
         setState(() {});
       } else {
-        print('Request failed with status: ${response.statusCode}');
+        toast('Request failed with status: ${response.statusCode}');
         _controller.stop();
         currentText = '抓取玩家歷史戰績錯誤';
         setState(() {});
       }
     } catch (error) {
-      print('Error: $error');
+      toast('Error: $error');
       _controller.stop();
       currentText = '抓取玩家歷史戰績錯誤';
       setState(() {});
@@ -369,11 +378,11 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
 
         return '牌位：${currenttierpatched.toString()}\n競技分數：${rankingInTier.toString()}';
       } else {
-        print('Request failed with status: ${response.statusCode}');
+        toast('Request failed with status: ${response.statusCode}');
         return "Request failed with status: ${response.statusCode}";
       }
     } catch (error) {
-      print('Error: $error');
+      toast('Error: $error');
       return "Error: $error";
     }
   }
@@ -403,11 +412,6 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
         String? name = jsonData['data']['name'];
         String? tag = jsonData['data']['tag'];
         String? smallCardImageUrl = jsonData['data']['card']?['small'];
-        String? largeCardImageUrl = jsonData['data']['card']?['large'];
-        String? wideCardImageUrl = jsonData['data']['card']?['wide'];
-        String? cardId = jsonData['data']['card']?['id'];
-        String? lastUpdate = jsonData['last_update'];
-        int? lastUpdateRaw = jsonData['last_update_raw'];
 
         gameName = name.toString();
         tagLine = tag.toString();
@@ -425,13 +429,13 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
         getplayer_match_history();
       } else {
         play_im_data = '錯誤!找不到該玩家';
-        print('Request failed with status: ${response.statusCode}');
+        toast('Request failed with status: ${response.statusCode}');
         setState(() {
         });
       }
     } catch (error) {
       play_im_data = '抓取玩家資料錯誤';
-      print('Error: $error');
+      toast('Error: $error');
       setState(() {
       });
     }
@@ -457,6 +461,7 @@ class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin
       });
   }
 
+  @override
   void initState() {
     super.initState();
     pagefirstrun();

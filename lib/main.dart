@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:Valorant_Match/playerdetail.dart';
 import 'package:Valorant_Match/dhn.dart';
@@ -65,7 +64,7 @@ class _MyAppState extends State<MyApp> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => playerdt(gameNameedit: gameNameedit.text.toString(),tagLineedit:tagLineedit.text.toString()),
+                        builder: (context) => Playerdt(gameNameedit: gameNameedit.text.toString(),tagLineedit:tagLineedit.text.toString()),
                       ),
                     );
                   },
