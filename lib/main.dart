@@ -1,8 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:Valorant_Match/playerdetail.dart';
+import 'package:Valorant_Match/dhn.dart';
 
 void main() {
   runApp(const MaterialApp(home: MyApp()));
@@ -80,16 +79,5 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
-  }
-  void toast(msg) {
-    Fluttertoast.cancel();
-    Fluttertoast.showToast(
-        msg: msg,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0);
   }
 }

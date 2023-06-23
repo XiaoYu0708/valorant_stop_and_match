@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 Map<String, String> map = {
   "bind": "劫境之地",
   "haven": "遺落境地",
@@ -21,3 +24,15 @@ Map<String, String> mode = {
   "swiftplay": "超速衝點",
   "custom game": "自訂模式",
 };
+
+void toast(msg) {
+  Fluttertoast.cancel();
+  Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0);
+}

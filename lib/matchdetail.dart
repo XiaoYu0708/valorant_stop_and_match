@@ -1,8 +1,5 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:Valorant_Match/dhn.dart';
 import 'package:Valorant_Match/playerdetail.dart';
 
@@ -30,6 +27,7 @@ class _matchdtlState extends State<matchdtl> {
   List<TableRow> matchtableRows = [];
 
   String? gamestarttime = '';
+  String? titlequeue = '';
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +73,13 @@ class _matchdtlState extends State<matchdtl> {
                     ),
                   ),
                   Text(
+                    titlequeue.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
                     widget.titlerowData[0],
                     textAlign: TextAlign.right,
                     style: const TextStyle(
@@ -105,30 +110,28 @@ class _matchdtlState extends State<matchdtl> {
       ),
     );
   }
-  void toast(msg) {
-    Fluttertoast.cancel();
-    Fluttertoast.showToast(
-        msg: msg,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0);
-  }
 
   void matchdtdw() async {
     //抓取本場詳細資訊
     try {
         Map<String, dynamic> jsonData = widget.jsonData;
         var i = widget.index;
-        String myteam = '';
 
         List<List<String>> tableData = [
           ['特務', '隊伍', '名稱', '標籤', 'K', 'D', 'A', 'KD']
         ]; //特務,隊伍,名稱,標籤,K,D,A
 
         gamestarttime = jsonData['data'][i]['metadata']['game_start_patched'];
+
+        if(jsonData['data'][i]['metadata']['mode'] == "Custom Game"){
+          setState(() {
+            if(mode[jsonData['data'][i]['metadata']['queue'].toLowerCase()] != null){
+              titlequeue = mode[jsonData['data'][i]['metadata']['queue'].toLowerCase()].toString();
+            }else{
+              titlequeue = jsonData['data'][i]['metadata']['queue'];
+            }
+          });
+        }
 
         for (var j = 0;
         j < jsonData['data'][i]['players']['all_players'].length;
@@ -148,39 +151,29 @@ class _matchdtlState extends State<matchdtl> {
           String? jtag = jsonData['data'][i]['players']['all_players'][j]['tag'];
           String? jteam = jsonData['data'][i]['players']['all_players'][j]['team'];
 
-
-          jmap = map[jmap.toString().toLowerCase()];
-          jmode = mode[jmode.toString().toLowerCase()];
-
-          if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
-            tableData.add([
-              jagentimg.toString(),
-              '',
-              jname.toString(),
-              jtag.toString(),
-              jk.toString(),
-              jd.toString(),
-              ja.toString(),
-              (jk/jd).toStringAsFixed(1)
-            ]);
-          } else {
-            myteam =
-            jsonData['data'][i]['players']['all_players'][j]['team'];
-            myteam = myteam.toLowerCase();
-
-            tableData.add([
-              jagentimg.toString(),
-              jteam.toString(),
-              jname.toString(),
-              jtag.toString(),
-              jk.toString(),
-              jd.toString(),
-              ja.toString(),
-              (jk/jd).toStringAsFixed(1)
-            ]);
+          if(map[jmap.toString().toLowerCase()] != null){
+            jmap = map[jmap.toString().toLowerCase()];
           }
-        }
 
+          if(mode[jmode.toString().toLowerCase()] != null){
+            jmode = mode[jmode.toString().toLowerCase()];
+          }
+
+          if(jteam != 'Red' && jteam != 'Blue'){
+            jteam = '';
+          }
+
+          tableData.add([
+            jagentimg.toString(),
+            jteam.toString(),
+            jname.toString(),
+            jtag.toString(),
+            jk.toString(),
+            jd.toString(),
+            ja.toString(),
+            (jk/jd).toStringAsFixed(1)
+          ]);
+        }
 
         for (var rowData in tableData) {
           List<Widget> cells = [];
@@ -215,7 +208,13 @@ class _matchdtlState extends State<matchdtl> {
             }
           }
 
-          if(rowData.contains(widget.gameName.toString()) && rowData.contains(widget.tagLine.toString())){
+          if(tableData.indexOf(rowData) == 0){
+            matchtableRows.add(
+              TableRow(
+                children: cells,
+              ),
+            );
+          }else if(rowData.contains(widget.gameName.toString()) && rowData.contains(widget.tagLine.toString())){
             matchtableRows.add(
               TableRow(
                 decoration: BoxDecoration(
@@ -299,12 +298,6 @@ class _matchdtlState extends State<matchdtl> {
                     child: cell,
                   );
                 }).toList(),
-              ),
-            );
-          } else{
-            matchtableRows.add(
-              TableRow(
-                children: cells,
               ),
             );
           }

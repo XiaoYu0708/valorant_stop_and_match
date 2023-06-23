@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:fluttertoast/fluttertoast.dart';
 import 'matchdetail.dart';
 import 'package:Valorant_Match/dhn.dart';
 
@@ -25,8 +23,20 @@ String tagLine = ""; //PlayerTag
 
 String puuid = ''; //player puuid
 
-class _playerdtState extends State<playerdt> {
-  var play_im_data = '請先輸入玩家資訊';
+class _playerdtState extends State<playerdt> with SingleTickerProviderStateMixin{
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  List<String> loadingTexts = [
+    '歷史戰績載入中.',
+    '歷史戰績載入中..',
+    '歷史戰績載入中...',
+  ];
+
+  int currentIndex = 0;
+  String currentText = '';
+
+  var play_im_data = '玩家資訊載入中...';
   var jsonData;
 
   String? puuid = '';
@@ -89,6 +99,12 @@ class _playerdtState extends State<playerdt> {
                   ),
                 ],
               ),
+              Center(
+                child: Text(
+                    currentText,
+                    style: const TextStyle(fontSize: 20),
+                ),
+              ),
               Table(
                 columnWidths: const {
                   0: IntrinsicColumnWidth(), // 列寬度設定為自動調整
@@ -110,18 +126,6 @@ class _playerdtState extends State<playerdt> {
       ),
     );
   }
-  void toast(msg) {
-    Fluttertoast.cancel();
-    Fluttertoast.showToast(
-        msg: msg,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0);
-  }
-
   void getplayer_match_history() async {
     //抓取玩家歷史戰績
     try {
@@ -162,53 +166,44 @@ class _playerdtState extends State<playerdt> {
               jmode = mode[jmode.toString().toLowerCase()];
             }
 
-
-
             if (puuid.toString() == jpuuid.toString()) {
-              if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
-                List<int> playerskills = [];
+              myteam =
+              jsonData['data'][i]['players']['all_players'][j]['team'];
+              myteam = myteam.toLowerCase();
+              String? myteamscore = '';
+              String? elsmodewinloss = '';
 
-                for(int ts=0;ts < jsonData['data'][i]['players']['all_players'].length;ts++){
-                  playerskills.add(jsonData['data'][i]['players']['all_players'][ts]['stats']['kills']);
-                }
+              List<int> playerskills = [];
 
-                int? matchmaxkills = playerskills.reduce((value, element) => value > element ? value : element);
-                String? myteamscore = '${matchmaxkills.toString()} : ${jk.toString()}';
+              for(int ts=0;ts < jsonData['data'][i]['players']['all_players'].length;ts++){
+                playerskills.add(jsonData['data'][i]['players']['all_players'][ts]['stats']['kills']);
+              }
 
-                tableData.add([
-                  jagentimg.toString(),
-                  jmap.toString(),
-                  jmode.toString(),
-                  myteamscore.toString(),
-                  jk.toString(),
-                  jd.toString(),
-                  ja.toString(),
-                  '',
-                ]);
-              } else {
-                myteam =
-                jsonData['data'][i]['players']['all_players'][j]['team'];
-                myteam = myteam.toLowerCase();
-                String? myteamscore = '${jsonData['data'][i]['teams'][myteam]['rounds_won']} : ${jsonData['data'][i]['teams'][myteam]['rounds_lost']}';
-                String? elsmodewinloss = '';
-
+              try{
                 if (jsonData['data'][i]['teams'][myteam]['has_won'] == true) {
                   elsmodewinloss = 'Win';
-                }else{
+                }else if(jsonData['data'][i]['teams'][myteam]['has_won'] == false){
                   elsmodewinloss = 'Loss';
                 }
 
-                tableData.add([
-                  jagentimg.toString(),
-                  jmap.toString(),
-                  jmode.toString(),
-                  myteamscore.toString(),
-                  jk.toString(),
-                  jd.toString(),
-                  ja.toString(),
-                  elsmodewinloss.toString(),
-                ]);
+                myteamscore = '${jsonData['data'][i]['teams'][myteam]['rounds_won']} : ${jsonData['data'][i]['teams'][myteam]['rounds_lost']}';
+              }catch(e){
+                elsmodewinloss = '';
+
+                int? matchmaxkills = playerskills.reduce((value, element) => value > element ? value : element);
+                myteamscore = '${matchmaxkills.toString()} : ${jk.toString()}';
               }
+
+              tableData.add([
+                jagentimg.toString(),
+                jmap.toString(),
+                jmode.toString(),
+                myteamscore.toString(),
+                jk.toString(),
+                jd.toString(),
+                ja.toString(),
+                elsmodewinloss.toString(),
+              ]);
             }
           }
         }
@@ -241,29 +236,12 @@ class _playerdtState extends State<playerdt> {
             }
           }
 
-          if(rowData.contains("死鬥模式")){
+          if(tableData.indexOf(rowData) == 0){
             matchtableRows.add(
               TableRow(
-                decoration: BoxDecoration(
-                  color: Colors.green[200],
-                ),
-                children: cells.map((Widget cell) {
-                  int index = tableData.indexOf(rowData) - 1;
-                  return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
-                          ),
-                        );
-                      },
-                      child: cell,
-                  );
-                }).toList(),
+                children: cells,
               ),
             );
-
           }else if (rowData.contains("Win")) {
             matchtableRows.add(
               TableRow(
@@ -309,27 +287,66 @@ class _playerdtState extends State<playerdt> {
                 }).toList(),
               ),
             );
-          }else{
+          }else if(rowData.contains("死鬥模式")){
             matchtableRows.add(
               TableRow(
-                children: cells,
+                decoration: BoxDecoration(
+                  color: Colors.green[200],
+                ),
+                children: cells.map((Widget cell) {
+                  int index = tableData.indexOf(rowData) - 1;
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                        ),
+                      );
+                    },
+                    child: cell,
+                  );
+                }).toList(),
+              ),
+            );
+          }else if(rowData.contains("自訂模式")){
+            matchtableRows.add(
+              TableRow(
+                decoration: BoxDecoration(
+                  color: Colors.purple[400],
+                ),
+                children: cells.map((Widget cell) {
+                  int index = tableData.indexOf(rowData) - 1;
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                        ),
+                      );
+                    },
+                    child: cell,
+                  );
+                }).toList(),
               ),
             );
           }
         }
-        toast("資料更新完成");
-        setState(() {
-
-        });
+        _controller.stop();
+        currentText = '';
+        setState(() {});
       } else {
         print('Request failed with status: ${response.statusCode}');
+        _controller.stop();
+        currentText = '抓取玩家歷史戰績錯誤';
+        setState(() {});
       }
     } catch (error) {
       print('Error: $error');
-      toast("抓取玩家歷史戰績錯誤");
-    } finally {
-      setState(() {
-      });
+      _controller.stop();
+      currentText = '抓取玩家歷史戰績錯誤';
+      setState(() {});
     }
   }
 
@@ -368,14 +385,12 @@ class _playerdtState extends State<playerdt> {
         'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
         playerrankImageUrl =
         'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
-        play_im_data = "請先輸入玩家資訊";
+        play_im_data = "玩家資訊載入中...";
         matchtableRows.clear();
       });
 
       gameName = widget.gameNameedit.toString();
       tagLine = widget.tagLineedit.toString();
-
-      toast("資料驗證中");
 
       final response = await http.get(Uri.parse(
           'https://api.henrikdev.xyz/valorant/v1/account/${gameName.toString()}/${tagLine.toString()}?force=true'));
@@ -402,31 +417,56 @@ class _playerdtState extends State<playerdt> {
 
         String mmr = await getplayer_mmr();
 
-        getplayer_match_history();
-
         setState(() {
           play_im_data =
           '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}\n${mmr.toString()}';
           playersmallCardImageUrl = smallCardImageUrl.toString();
         });
-        toast("驗證成功");
+        animation();
+        getplayer_match_history();
       } else {
-        toast("錯誤!找不到該玩家");
+        play_im_data = '錯誤!找不到該玩家';
         print('Request failed with status: ${response.statusCode}');
         setState(() {
         });
       }
     } catch (error) {
-      toast("抓取玩家資料錯誤");
+      play_im_data = '抓取玩家資料錯誤';
       print('Error: $error');
       setState(() {
       });
     }
   }
+
+  void animation(){
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    )..repeat();
+
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller)
+      ..addListener(() {
+        setState(() {
+          if (_animation.value >= 0.0 && _animation.value < 0.33) {
+            currentText = loadingTexts[0];
+          } else if (_animation.value >= 0.33 && _animation.value < 0.66) {
+            currentText = loadingTexts[1];
+          } else {
+            currentText = loadingTexts[2];
+          }
+        });
+      });
+  }
+
   void initState() {
     super.initState();
-    // 在这里执行您的函数
     pagefirstrun();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
 
