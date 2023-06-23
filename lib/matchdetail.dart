@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:Valorant_Match/dhn.dart';
+import 'package:Valorant_Match/playerdetail.dart';
 
 class matchdtl extends StatefulWidget {
   final int index;
@@ -27,7 +28,6 @@ class matchdtl extends StatefulWidget {
 
 class _matchdtlState extends State<matchdtl> {
   List<TableRow> matchtableRows = [];
-  List<TableRow> matchtitletableRows = [];
 
   String? gamestarttime = '';
 
@@ -85,24 +85,14 @@ class _matchdtlState extends State<matchdtl> {
               ),
               Table(
                 columnWidths: const {
-                  0: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  1: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  2: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                },
-                border: TableBorder.all(color: Colors.transparent),
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                children: matchtitletableRows,
-              ),
-              Table(
-                columnWidths: const {
-                  0: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  1: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  2: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  3: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  4: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  5: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  6: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  7: IntrinsicColumnWidth(), // 列寬度設定為自動調整
+                  0: IntrinsicColumnWidth(),
+                  1: IntrinsicColumnWidth(),
+                  2: FixedColumnWidth(120),
+                  3: IntrinsicColumnWidth(),
+                  4: IntrinsicColumnWidth(),
+                  5: IntrinsicColumnWidth(),
+                  6: IntrinsicColumnWidth(),
+                  7: IntrinsicColumnWidth(),
                 },
                 border: TableBorder.all(color: Colors.transparent),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -138,14 +128,8 @@ class _matchdtlState extends State<matchdtl> {
           ['特務', '隊伍', '名稱', '標籤', 'K', 'D', 'A', 'KD']
         ]; //特務,隊伍,名稱,標籤,K,D,A
 
-
         gamestarttime = jsonData['data'][i]['metadata']['game_start_patched'];
 
-        if(jsonData['data'][i]['metadata']['mode'] == "Deathmatch"){
-          tableData = [
-            ['特務', '名稱', '標籤', 'K', 'D', 'A', 'KD']
-          ]; //特務,名稱,標籤,K,D,A
-        }
         for (var j = 0;
         j < jsonData['data'][i]['players']['all_players'].length;
         j++) {
@@ -171,6 +155,7 @@ class _matchdtlState extends State<matchdtl> {
           if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
             tableData.add([
               jagentimg.toString(),
+              '',
               jname.toString(),
               jtag.toString(),
               jk.toString(),
@@ -218,20 +203,38 @@ class _matchdtlState extends State<matchdtl> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Center(
-                    child: Text(cellData),
+                    child: Text(
+                      cellData,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
               );
+
             }
           }
 
           if(rowData.contains(widget.gameName.toString()) && rowData.contains(widget.tagLine.toString())){
             matchtableRows.add(
               TableRow(
-                  decoration: BoxDecoration(
-                    color: Colors.amberAccent[700],
-                  ),
-                  children: cells
+                decoration: BoxDecoration(
+                  color: Colors.amberAccent[700],
+                ),
+                children: cells.map((Widget cell) {
+                  int index = tableData.indexOf(rowData) - 1;
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => playerdt(gameNameedit: rowData[2],tagLineedit:rowData[3]),
+                        ),
+                      );
+                    },
+                    child: cell,
+                  );
+                }).toList(),
               ),
             );
           }else if (rowData.contains("Blue")) {
@@ -240,7 +243,20 @@ class _matchdtlState extends State<matchdtl> {
                 decoration: BoxDecoration(
                   color: Colors.blue[300],
                 ),
-                children: cells
+                children: cells.map((Widget cell) {
+                  int index = tableData.indexOf(rowData) - 1;
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => playerdt(gameNameedit: rowData[2],tagLineedit:rowData[3]),
+                        ),
+                      );
+                    },
+                    child: cell,
+                  );
+                }).toList(),
               ),
             );
 
@@ -250,7 +266,20 @@ class _matchdtlState extends State<matchdtl> {
                 decoration: BoxDecoration(
                   color: Colors.red[300],
                 ),
-                children: cells
+                children: cells.map((Widget cell) {
+                  int index = tableData.indexOf(rowData) - 1;
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => playerdt(gameNameedit: rowData[2],tagLineedit:rowData[3]),
+                        ),
+                      );
+                    },
+                    child: cell,
+                  );
+                }).toList(),
               ),
             );
           }else{
@@ -262,7 +291,6 @@ class _matchdtlState extends State<matchdtl> {
           }
         }
 
-        toast("資料更新完成");
         setState(() {
 
         });
