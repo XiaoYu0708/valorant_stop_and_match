@@ -137,10 +137,7 @@ class _playerdtState extends State<playerdt> {
           ['特務', '地圖', '模式', '比數', 'K', 'D', 'A', '勝敗']
         ]; //特務,地圖,模式,比數,K,D,A,勝敗
 
-        List<String> matchsid = [];
-
         for (var i = 0; i < jsonData['data'].length; i++) {
-          matchsid.add(jsonData['data'][i]['metadata']['matchid']);
           for (var j = 0;
           j < jsonData['data'][i]['players']['all_players'].length;
           j++) {
@@ -244,13 +241,7 @@ class _playerdtState extends State<playerdt> {
             }
           }
 
-          if (!rowData.contains("Win") && !rowData.contains("Loss") && !rowData.contains("死鬥模式")) {
-            matchtableRows.add(
-              TableRow(
-                children: cells,
-              ),
-            );
-          }else if(rowData.contains("死鬥模式")){
+          if(rowData.contains("死鬥模式")){
             matchtableRows.add(
               TableRow(
                 decoration: BoxDecoration(
@@ -263,7 +254,7 @@ class _playerdtState extends State<playerdt> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => matchdtl(matchid: matchsid[index],titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName,tagLine:tagLine),
+                            builder: (context) => matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                           ),
                         );
                       },
@@ -286,7 +277,7 @@ class _playerdtState extends State<playerdt> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => matchdtl(matchid: matchsid[index],titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName,tagLine:tagLine),
+                          builder: (context) => matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                         ),
                       );
                     },
@@ -309,13 +300,19 @@ class _playerdtState extends State<playerdt> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => matchdtl(matchid: matchsid[index],titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName,tagLine:tagLine),
+                          builder: (context) => matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData,),
                         ),
                       );
                     },
                     child: cell,
                   );
                 }).toList(),
+              ),
+            );
+          }else{
+            matchtableRows.add(
+              TableRow(
+                children: cells,
               ),
             );
           }
@@ -397,6 +394,9 @@ class _playerdtState extends State<playerdt> {
         String? cardId = jsonData['data']['card']?['id'];
         String? lastUpdate = jsonData['last_update'];
         int? lastUpdateRaw = jsonData['last_update_raw'];
+
+        gameName = name.toString();
+        tagLine = tag.toString();
 
         city = region.toString();
 

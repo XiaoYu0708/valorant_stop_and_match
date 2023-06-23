@@ -6,17 +6,19 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:Valorant_Match/dhn.dart';
 
 class matchdtl extends StatefulWidget {
-  final String matchid;
+  final int index;
   final List<String> titlerowData;
   final String gameName;
   final String tagLine;
+  final Map<String, dynamic> jsonData;
 
   const matchdtl({
     Key? key,
-    required this.matchid,
+    required this.index,
     required this.titlerowData,
     required this.gameName,
-    required this.tagLine
+    required this.tagLine,
+    required this.jsonData
   }) : super(key: key);
 
   @override
@@ -128,58 +130,45 @@ class _matchdtlState extends State<matchdtl> {
   void matchdtdw() async {
     //抓取本場詳細資訊
     try {
-      final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v2/match/${widget.matchid.toString()}'));
-
-      if (response.statusCode == 200) {
-        Map<String, dynamic> jsonData = jsonDecode(response.body);
-
+        Map<String, dynamic> jsonData = widget.jsonData;
+        var i = widget.index;
         String myteam = '';
 
         List<List<String>> tableData = [
           ['特務', '隊伍', '名稱', '標籤', 'K', 'D', 'A', 'KD']
         ]; //特務,隊伍,名稱,標籤,K,D,A
 
-        if(jsonData['data']['metadata']['mode'] == "Deathmatch"){
+
+        gamestarttime = jsonData['data'][i]['metadata']['game_start_patched'];
+
+        if(jsonData['data'][i]['metadata']['mode'] == "Deathmatch"){
           tableData = [
             ['特務', '名稱', '標籤', 'K', 'D', 'A', 'KD']
           ]; //特務,名稱,標籤,K,D,A
         }
-
-        gamestarttime = jsonData['data']['metadata']['game_start_patched'];
-
         for (var j = 0;
-        j < jsonData['data']['players']['all_players'].length;
+        j < jsonData['data'][i]['players']['all_players'].length;
         j++) {
-          String? jmap = jsonData['data']['metadata']['map'];
-          String? jpuuid =
-          jsonData['data']['players']['all_players'][j]['puuid'];
-          String? jmode = jsonData['data']['metadata']['mode'];
-          String? jagentimg = jsonData['data']['players']['all_players'][j]
+          String? jmap = jsonData['data'][i]['metadata']['map'];
+          String? jmode = jsonData['data'][i]['metadata']['mode'];
+          String? jagentimg = jsonData['data'][i]['players']['all_players'][j]
           ['assets']['agent']['small'];
-          String? jname = jsonData['data']['players']['all_players'][j]['name'];
-          String? jtag = jsonData['data']['players']['all_players'][j]['tag'];
-          String? jteam = jsonData['data']['players']['all_players'][j]['team'];
-
-          int jk = jsonData['data']['players']['all_players'][j]['stats']
+          int jk = jsonData['data'][i]['players']['all_players'][j]['stats']
           ['kills'];
-          int jd = jsonData['data']['players']['all_players'][j]['stats']
+          int jd = jsonData['data'][i]['players']['all_players'][j]['stats']
           ['deaths'];
-          int ja = jsonData['data']['players']['all_players'][j]['stats']
+          int ja = jsonData['data'][i]['players']['all_players'][j]['stats']
           ['assists'];
+
+          String? jname = jsonData['data'][i]['players']['all_players'][j]['name'];
+          String? jtag = jsonData['data'][i]['players']['all_players'][j]['tag'];
+          String? jteam = jsonData['data'][i]['players']['all_players'][j]['team'];
+
 
           jmap = map[jmap.toString().toLowerCase()];
           jmode = mode[jmode.toString().toLowerCase()];
 
-          if (jsonData['data']['metadata']['mode'] == "Deathmatch") {
-            List<int> playerskills = [];
-
-            for(int ts=0;ts < jsonData['data']['players']['all_players'].length;ts++){
-              playerskills.add(jsonData['data']['players']['all_players'][ts]['stats']['kills']);
-            }
-
-            int? matchmaxkills = playerskills.reduce((value, element) => value > element ? value : element);
-            String? myteamscore = '${matchmaxkills.toString()} : ${jk.toString()}';
-
+          if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
             tableData.add([
               jagentimg.toString(),
               jname.toString(),
@@ -191,16 +180,8 @@ class _matchdtlState extends State<matchdtl> {
             ]);
           } else {
             myteam =
-            jsonData['data']['players']['all_players'][j]['team'];
+            jsonData['data'][i]['players']['all_players'][j]['team'];
             myteam = myteam.toLowerCase();
-            String? myteamscore = '${jsonData['data']['teams'][myteam]['rounds_won']} : ${jsonData['data']['teams'][myteam]['rounds_lost']}';
-            String? elsmodewinloss = '';
-
-            if (jsonData['data']['teams'][myteam]['has_won'] == true) {
-              elsmodewinloss = 'Win';
-            }else{
-              elsmodewinloss = 'Loss';
-            }
 
             tableData.add([
               jagentimg.toString(),
@@ -214,6 +195,8 @@ class _matchdtlState extends State<matchdtl> {
             ]);
           }
         }
+
+
         for (var rowData in tableData) {
           List<Widget> cells = [];
           for (var cellData in rowData) {
@@ -242,13 +225,7 @@ class _matchdtlState extends State<matchdtl> {
             }
           }
 
-          if (!rowData.contains("Blue") && !rowData.contains("Red") && !rowData.contains(widget.gameName) && !rowData.contains(widget.tagLine)) {
-            matchtableRows.add(
-              TableRow(
-                children: cells,
-              ),
-            );
-          }else if(rowData.contains(widget.gameName) && rowData.contains(widget.tagLine)){
+          if(rowData.contains(widget.gameName.toString()) && rowData.contains(widget.tagLine.toString())){
             matchtableRows.add(
               TableRow(
                   decoration: BoxDecoration(
@@ -276,6 +253,12 @@ class _matchdtlState extends State<matchdtl> {
                 children: cells
               ),
             );
+          }else{
+            matchtableRows.add(
+              TableRow(
+                children: cells,
+              ),
+            );
           }
         }
 
@@ -283,10 +266,6 @@ class _matchdtlState extends State<matchdtl> {
         setState(() {
 
         });
-
-      } else {
-        print('Request failed with status: ${response.statusCode}');
-      }
     } catch (error) {
       print('Error: $error');
     }
