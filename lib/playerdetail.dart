@@ -159,9 +159,12 @@ class _playerdtState extends State<playerdt> {
 
         List<List<String>> tableData = [
           ['特務', '地圖', '模式', '比數', 'K', 'D', 'A', '勝敗']
-        ]; //特務,地圖,模式,比數,K,D,A,KD,勝敗
+        ]; //特務,地圖,模式,比數,K,D,A,勝敗
+
+        List<String> matchsid = [];
 
         for (var i = 0; i < jsonData['data'].length; i++) {
+          matchsid.add(jsonData['data'][i]['metadata']['matchid']);
           for (var j = 0;
           j < jsonData['data'][i]['players']['all_players'].length;
           j++) {
@@ -178,8 +181,15 @@ class _playerdtState extends State<playerdt> {
             int ja = jsonData['data'][i]['players']['all_players'][j]['stats']
             ['assists'];
 
-            jmap = map[jmap.toString().toLowerCase()];
-            jmode = mode[jmode.toString().toLowerCase()];
+            if(map[jmap.toString().toLowerCase()]!=null){
+              jmap = map[jmap.toString().toLowerCase()];
+            }
+
+            if(mode[jmode.toString().toLowerCase()]!=null){
+              jmode = mode[jmode.toString().toLowerCase()];
+            }
+
+
 
             if (puuid.toString() == jpuuid.toString()) {
               if (jsonData['data'][i]['metadata']['mode'] == "Deathmatch") {
@@ -271,23 +281,22 @@ class _playerdtState extends State<playerdt> {
                   color: Colors.green[200],
                 ),
                 children: cells.map((Widget cell) {
+                  int index = tableData.indexOf(rowData) - 1;
                   return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => matchdtl(),
-                        ),
-                      );
-                    },
-                    child: Hero(
-                      tag: 'your_hero_tag',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => matchdtl(matchid: matchsid[index],titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName,tagLine:tagLine),
+                          ),
+                        );
+                      },
                       child: cell,
-                    ),
                   );
                 }).toList(),
               ),
             );
+
           }else if (rowData.contains("Win")) {
             matchtableRows.add(
               TableRow(
@@ -295,23 +304,22 @@ class _playerdtState extends State<playerdt> {
                   color: Colors.green[300],
                 ),
                 children: cells.map((Widget cell) {
+                  int index = tableData.indexOf(rowData) - 1;
                   return InkWell(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => matchdtl(),
+                          builder: (context) => matchdtl(matchid: matchsid[index],titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName,tagLine:tagLine),
                         ),
                       );
                     },
-                    child: Hero(
-                      tag: 'your_hero_tag',
-                      child: cell,
-                    ),
+                    child: cell,
                   );
                 }).toList(),
               ),
             );
+
           } else if (rowData.contains("Loss")) {
             matchtableRows.add(
               TableRow(
@@ -319,19 +327,17 @@ class _playerdtState extends State<playerdt> {
                   color: Colors.red[300],
                 ),
                 children: cells.map((Widget cell) {
+                  int index = tableData.indexOf(rowData) - 1;
                   return InkWell(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => matchdtl(),
+                          builder: (context) => matchdtl(matchid: matchsid[index],titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName,tagLine:tagLine),
                         ),
                       );
                     },
-                    child: Hero(
-                      tag: 'your_hero_tag',
-                      child: cell,
-                    ),
+                    child: cell,
                   );
                 }).toList(),
               ),
