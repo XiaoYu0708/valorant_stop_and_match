@@ -168,6 +168,14 @@ class _MatchdtlState extends State<Matchdtl> {
             jteam = '';
           }
 
+          String kd = '0';
+
+          try{
+            kd = (jk/jd).toStringAsFixed(1);
+          }catch(e){
+            kd = jk.toString();
+          }
+
           tableData.add([
             jagentimg.toString(),
             jteam.toString(),
@@ -176,7 +184,7 @@ class _MatchdtlState extends State<Matchdtl> {
             jk.toString(),
             jd.toString(),
             ja.toString(),
-            (jk/jd).toStringAsFixed(1)
+            kd.toString()
           ]);
         }
 

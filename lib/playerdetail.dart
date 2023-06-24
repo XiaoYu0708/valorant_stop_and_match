@@ -31,15 +31,16 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
   late Animation<double> _animation;
 
   List<String> loadingTexts = [
-    '歷史戰績載入中.',
-    '歷史戰績載入中..',
-    '歷史戰績載入中...',
+    '.',
+    '..',
+    '...',
   ];
 
   int currentIndex = 0;
   String currentText = '';
 
-  String play_im_data = '玩家資訊載入中...';
+  String history_match_data = '';
+  bool player_load = false;
 
   String? puuid = '';
   String city = '';
@@ -50,6 +51,12 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
       'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
 
   List<TableRow> matchtableRows = [];
+
+  String player_server_data = '';
+  String player_name_data = '';
+  String player_tag_data = '';
+  String player_level_data = '';
+  String player_mmr_data = '';
 
   @override
   Widget build(BuildContext context) {
@@ -89,9 +96,37 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                     ),
                   ),
                   Expanded(
-                    child: Text(
-                      play_im_data,
-                      textAlign: TextAlign.left,
+                    child: Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            player_server_data,
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            player_name_data,
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            player_tag_data,
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            player_level_data,
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            player_mmr_data,
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Image.network(
@@ -103,7 +138,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
               ),
               Center(
                 child: Text(
-                    currentText,
+                    history_match_data,
                     style: const TextStyle(fontSize: 20),
                 ),
               ),
@@ -238,7 +273,11 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Center(
-                    child: Text(cellData),
+                    child: Text(
+                      cellData,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
               );
@@ -360,18 +399,18 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
           }
         }
         _controller.stop();
-        currentText = '';
+        history_match_data = '';
         setState(() {});
       } else {
         toast('Request failed with status: ${response.statusCode}');
         _controller.stop();
-        currentText = '抓取玩家歷史戰績錯誤';
+        history_match_data = '抓取玩家歷史戰績錯誤';
         setState(() {});
       }
     } catch (error) {
       toast('Error: $error');
       _controller.stop();
-      currentText = '抓取玩家歷史戰績錯誤';
+      history_match_data = '抓取玩家歷史戰績錯誤';
       setState(() {});
     }
   }
@@ -389,11 +428,13 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
         String? smallCardImageUrl = jsonData['data']['images']?['small'];
         int? rankingInTier = jsonData['data']['ranking_in_tier'];
 
-        playerrankImageUrl = smallCardImageUrl.toString();
+        if(smallCardImageUrl!=null){
+          playerrankImageUrl = smallCardImageUrl.toString();
+        }
 
         rankingInTier ??= 0;
 
-        return '牌位：${currenttierpatched.toString()}\n競技分數：${rankingInTier.toString()}';
+        return '牌位：${currenttierpatched.toString()}(${rankingInTier.toString()})';
       } else {
         toast('Request failed with status: ${response.statusCode}');
         return "Request failed with status: ${response.statusCode}";
@@ -411,7 +452,6 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
         'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
         playerrankImageUrl =
         'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
-        play_im_data = "玩家資訊載入中...";
         matchtableRows.clear();
       });
 
@@ -437,21 +477,29 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
 
         String mmr = await getplayer_mmr();
 
+        player_load = true;
+
         setState(() {
-          play_im_data =
-          '伺服器：${region.toString()}\n帳號名稱：${name.toString()}\n標籤：#${tag.toString()}\n等級：${accountLevel.toString()}\n${mmr.toString()}';
-          playersmallCardImageUrl = smallCardImageUrl.toString();
+          player_server_data = '伺服器：${region.toString()}';
+          player_name_data = '帳號名稱：${name.toString()}';
+          player_tag_data = '標籤：#${tag.toString()}';
+          player_level_data = '等級：${accountLevel.toString()}';
+          player_mmr_data = mmr.toString();
+
+          if(smallCardImageUrl != null){
+            playersmallCardImageUrl = smallCardImageUrl.toString();
+          }
         });
-        animation();
+
         getplayer_match_history();
       } else {
-        play_im_data = '錯誤!找不到該玩家';
+        player_server_data = '錯誤!找不到該玩家';
         toast('Request failed with status: ${response.statusCode}');
         setState(() {
         });
       }
     } catch (error) {
-      play_im_data = '抓取玩家資料錯誤';
+      player_server_data = '抓取玩家資料錯誤';
       toast('Error: $error');
       setState(() {
       });
@@ -474,6 +522,10 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
           } else {
             currentText = loadingTexts[2];
           }
+          if(player_load == false){
+            player_server_data = '玩家資訊載入中${currentText.toString()}';
+          }
+          history_match_data = '歷史戰績載入中${currentText.toString()}';
         });
       });
   }
@@ -481,6 +533,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
+    animation();
     pagefirstrun();
   }
 
