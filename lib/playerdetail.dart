@@ -146,7 +146,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                 columnWidths: const {
                   0: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                   1: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  2: IntrinsicColumnWidth(), // 列寬度設定為自動調整
+                  2: FixedColumnWidth(75),
                   3: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                   4: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                   5: IntrinsicColumnWidth(), // 列寬度設定為自動調整
