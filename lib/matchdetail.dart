@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Valorant_Match/dhn.dart';
+import 'package:Valorant_Match/main.dart';
 import 'package:Valorant_Match/playerdetail.dart';
 
 class Matchdtl extends StatefulWidget {
@@ -103,7 +104,23 @@ class _MatchdtlState extends State<Matchdtl> {
                 children: matchtableRows,
               ),
               Text(gamestarttime.toString()),
+              const Text("\n\n\n\n"),
             ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MyApp(),
+              ),
+            );
+          },
+          backgroundColor: const Color.fromRGBO(120, 190, 230, 0.3),
+          child: const Icon(
+            Icons.home,
+            color: Color.fromRGBO(255, 255, 255, 0.3),
           ),
         ),
       ),

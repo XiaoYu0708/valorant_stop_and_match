@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:convert';
+import 'package:Valorant_Match/main.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'matchdetail.dart';
@@ -121,7 +122,23 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                 children: matchtableRows,
               ),
+              const Text("\n\n\n\n"),
             ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MyApp(),
+              ),
+            );
+          },
+          backgroundColor: const Color.fromRGBO(120, 190, 230, 0.3),
+          child: const Icon(
+            Icons.home,
+            color: Color.fromRGBO(255, 255, 255, 0.3),
           ),
         ),
       ),
