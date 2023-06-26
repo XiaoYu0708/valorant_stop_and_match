@@ -118,7 +118,7 @@ class _MatchdtlState extends State<Matchdtl> {
             );
           },
           backgroundColor: const Color.fromRGBO(120, 190, 230, 0.3),
-          child: const Icon(
+          child: const Icon(//回首頁按鈕
             Icons.home,
             color: Color.fromRGBO(255, 255, 255, 0.3),
           ),
@@ -139,15 +139,30 @@ class _MatchdtlState extends State<Matchdtl> {
 
         gamestarttime = jsonData['data'][i]['metadata']['game_start_patched'];
 
-        if(jsonData['data'][i]['metadata']['mode'] == "Custom Game"){
-          setState(() {
-            if(mode[jsonData['data'][i]['metadata']['queue'].toLowerCase()] != null){
-              titlequeue = mode[jsonData['data'][i]['metadata']['queue'].toLowerCase()].toString();
-            }else{
-              titlequeue = jsonData['data'][i]['metadata']['queue'];
-            }
-          });
+        try{//對自訂模式進行而外讀取遊戲模式
+          if(jsonData['data'][i]['metadata']['mode'] == "Custom Game"){
+            setState(() {
+              if(mode[jsonData['data'][i]['metadata']['queue'].toLowerCase()] != null){
+                titlequeue = mode[jsonData['data'][i]['metadata']['queue'].toLowerCase()].toString();
+              }else{
+                titlequeue = jsonData['data'][i]['metadata']['queue'];
+              }
+            });
+          }
+        }catch(e){
+          toast("自訂模式處理錯誤");
         }
+
+        try{//對玩家進行排序(根據score)
+          List<dynamic> allPlayers = jsonData['data'][i]['players']['all_players'];
+
+          allPlayers.sort((a, b) => b['stats']['score'].compareTo(a['stats']['score']));
+
+          jsonData['data'][i]['players']['all_players'] = allPlayers;
+        }catch(e){
+          toast("排序錯誤");
+        }
+
         for (var j = 0;
         j < jsonData['data'][i]['players']['all_players'].length;
         j++) {
@@ -170,10 +185,10 @@ class _MatchdtlState extends State<Matchdtl> {
 
           String kd = '0';
 
-          try{
-            kd = (jk/jd).toStringAsFixed(1);
-          }catch(e){
+          if(jd <= 0){
             kd = jk.toString();
+          }else{
+            kd = (jk/jd).toStringAsFixed(1);
           }
 
           tableData.add([

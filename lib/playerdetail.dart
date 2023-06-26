@@ -1,5 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:async';
 import 'dart:convert';
 import 'package:Valorant_Match/main.dart';
 import 'package:flutter/material.dart';
@@ -21,42 +22,25 @@ class Playerdt extends StatefulWidget {
   State<Playerdt> createState() => _PlayerdtState();
 }
 
-String gameName = ""; //PlayerName
-String tagLine = ""; //PlayerTag
-
-String puuid = ''; //player puuid
-
 class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin{
   late AnimationController _controller;
   late Animation<double> _animation;
-
-  List<String> loadingTexts = [
-    '.',
-    '..',
-    '...',
-  ];
-
-  int currentIndex = 0;
-  String currentText = '';
-
-  String history_match_data = '';
-  bool player_load = false;
-
-  String? puuid = '';
-  String city = '';
+  int load_check = 0;
   String response = '';
+
   String playersmallCardImageUrl =
       'https://media.valorant-api.com/playercards/9fb348bc-41a0-91ad-8a3e-818035c4e561/displayicon.png';
-  String playerrankImageUrl =
-      'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
-
-  List<TableRow> matchtableRows = [];
-
   String player_server_data = '';
   String player_name_data = '';
   String player_tag_data = '';
   String player_level_data = '';
   String player_mmr_data = '';
+  String playerrankImageUrl =
+      'https://media.valorant-api.com/competitivetiers/564d8e28-c226-3180-6285-e48a390db8b1/0/smallicon.png';
+
+  String history_match_data_title = '';
+
+  List<TableRow> matchtableRows = [];
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +120,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
               ),
               Center(
                 child: Text(
-                    history_match_data,
+                    history_match_data_title,
                     style: const TextStyle(fontSize: 20),
                 ),
               ),
@@ -169,7 +153,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
             );
           },
           backgroundColor: const Color.fromRGBO(120, 190, 230, 0.3),
-          child: const Icon(
+          child: const Icon(//回首頁按鈕
             Icons.home,
             color: Color.fromRGBO(255, 255, 255, 0.3),
           ),
@@ -177,11 +161,11 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
       ),
     );
   }
-  void getplayer_match_history() async {
+  void getplayer_match_history(String? puuid, String city, String gameName, String tagLine) async {
     //抓取玩家歷史戰績
     try {
-      final response = await http.get(Uri.parse(
-          'https://api.henrikdev.xyz/valorant/v3/by-puuid/matches/${city.toString()}/${puuid.toString()}?size=10'));
+      load_check = 2;
+      final response = await http.get(Uri.parse('https://api.henrikdev.xyz/valorant/v3/by-puuid/matches/${city.toString()}/${puuid.toString()}?size=10'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
@@ -397,23 +381,23 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
           }
         }
         _controller.stop();
-        history_match_data = '';
+        history_match_data_title = '';
         setState(() {});
       } else {
         toast('Request failed with status: ${response.statusCode}');
         _controller.stop();
-        history_match_data = '抓取玩家歷史戰績錯誤';
+        history_match_data_title = '錯誤!抓不到玩家歷史戰績';
         setState(() {});
       }
     } catch (error) {
       toast('Error: $error');
       _controller.stop();
-      history_match_data = '抓取玩家歷史戰績錯誤';
+      history_match_data_title = '抓取玩家歷史戰績錯誤';
       setState(() {});
     }
   }
 
-  Future<String> getplayer_mmr() async {
+  Future<String> getplayer_mmr(String city, String gameName,String tagLine) async {
     //抓取玩家牌位
     try {
       final response = await http.get(Uri.parse(
@@ -443,7 +427,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
     }
   }
 
-  void pagefirstrun() async {
+  void playerdw() async {
     try {
       setState(() {
         playersmallCardImageUrl =
@@ -453,15 +437,15 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
         matchtableRows.clear();
       });
 
-      gameName = widget.gameNameedit.toString();
-      tagLine = widget.tagLineedit.toString();
+      String gameName = widget.gameNameedit.toString(); //PlayerName
+      String tagLine = widget.tagLineedit.toString(); //PlayerTag
 
       final response = await http.get(Uri.parse(
           'https://api.henrikdev.xyz/valorant/v1/account/${gameName.toString()}/${tagLine.toString()}?force=true'));
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
 
-        puuid = jsonData['data']['puuid'];
+        String? puuid = jsonData['data']['puuid'];
         String? region = jsonData['data']['region'];
         int? accountLevel = jsonData['data']['account_level'];
         String? name = jsonData['data']['name'];
@@ -471,11 +455,11 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
         gameName = name.toString();
         tagLine = tag.toString();
 
-        city = region.toString();
+        String city = region.toString();
 
-        String mmr = await getplayer_mmr();
+        String mmr = await getplayer_mmr(city,gameName,tagLine);
 
-        player_load = true;
+        load_check = 1;
 
         setState(() {
           player_server_data = '伺服器：${region.toString()}';
@@ -488,23 +472,58 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
             playersmallCardImageUrl = smallCardImageUrl.toString();
           }
         });
-
-        getplayer_match_history();
+        getplayer_match_history(puuid,city,gameName,tagLine);
       } else {
+        _controller.stop();
         player_server_data = '錯誤!找不到該玩家';
-        toast('Request failed with status: ${response.statusCode}');
-        setState(() {
-        });
+        startTimer();
+        setState(() {});
       }
     } catch (error) {
+      _controller.stop();
       player_server_data = '抓取玩家資料錯誤';
       toast('Error: $error');
+      startTimer();
       setState(() {
       });
     }
   }
 
+  Timer? timer;
+
+  void startTimer() {
+    int countdown = 3;
+    timer = Timer.periodic(const Duration(seconds:  1), (timer) {
+      if(countdown > 0){
+        setState(() {
+          history_match_data_title = "即將返回首頁，倒數${countdown.toString()}";
+        });
+      }
+
+      if (countdown == 0) {
+        timer.cancel();
+        navigateToMyAppPage();
+      }
+
+      countdown--;
+    });
+  }
+
+  void navigateToMyAppPage() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const MyApp()),
+    );
+  }
+
   void animation(){
+    String currentText = '';
+    List<String> loadingTexts = [
+      '.',
+      '..',
+      '...',
+    ];
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -520,10 +539,11 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
           } else {
             currentText = loadingTexts[2];
           }
-          if(player_load == false){
+          if(load_check == 0){
             player_server_data = '玩家資訊載入中${currentText.toString()}';
+          }else if(load_check == 2){
+            history_match_data_title = '歷史戰績載入中${currentText.toString()}';
           }
-          history_match_data = '歷史戰績載入中${currentText.toString()}';
         });
       });
   }
@@ -532,11 +552,12 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
     animation();
-    pagefirstrun();
+    playerdw();
   }
 
   @override
   void dispose() {
+    timer?.cancel();
     _controller.dispose();
     super.dispose();
   }
