@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:Valorant_Match/dhn.dart';
 import 'package:Valorant_Match/main.dart';
@@ -16,7 +18,7 @@ class Matchdtl extends StatefulWidget {
     required this.titlerowData,
     required this.gameName,
     required this.tagLine,
-    required this.jsonData
+    required this.jsonData,
   }) : super(key: key);
 
   @override
@@ -91,13 +93,14 @@ class _MatchdtlState extends State<Matchdtl> {
               Table(
                 columnWidths: const {
                   0: IntrinsicColumnWidth(),
-                  1: IntrinsicColumnWidth(),
+                  1: FixedColumnWidth(0),
                   2: FixedColumnWidth(100),
-                  3: IntrinsicColumnWidth(),
+                  3: FixedColumnWidth(0),
                   4: IntrinsicColumnWidth(),
                   5: IntrinsicColumnWidth(),
                   6: IntrinsicColumnWidth(),
                   7: IntrinsicColumnWidth(),
+                  8: IntrinsicColumnWidth(),
                 },
                 border: TableBorder.all(color: Colors.transparent),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -134,8 +137,8 @@ class _MatchdtlState extends State<Matchdtl> {
         var i = widget.index;
 
         List<List<String>> tableData = [
-          ['特務', '隊伍', '名稱', '標籤', 'K', 'D', 'A', 'KD']
-        ]; //特務,隊伍,名稱,標籤,K,D,A
+          ['特務', '隊伍', '名稱', '標籤','平均戰力指數', 'K', 'D', 'A', 'KD']
+        ]; //特務,隊伍,名稱,標籤,平均戰力指數,K,D,A,KD
 
         gamestarttime = jsonData['data'][i]['metadata']['game_start_patched'];
 
@@ -178,6 +181,10 @@ class _MatchdtlState extends State<Matchdtl> {
           String? jname = jsonData['data'][i]['players']['all_players'][j]['name'];
           String? jtag = jsonData['data'][i]['players']['all_players'][j]['tag'];
           String? jteam = jsonData['data'][i]['players']['all_players'][j]['team'];
+          String? jpuuid = jsonData['data'][i]['players']['all_players'][j]['puuid'];
+
+          int jscore = jsonData['data'][i]['players']['all_players'][j]['stats']['score'];
+          int rounds = jsonData['data'][i]['metadata']['rounds_played'];
 
           if(jteam != 'Red' && jteam != 'Blue'){
             jteam = '';
@@ -196,6 +203,7 @@ class _MatchdtlState extends State<Matchdtl> {
             jteam.toString(),
             jname.toString(),
             jtag.toString(),
+            (jscore~/rounds).toString(),
             jk.toString(),
             jd.toString(),
             ja.toString(),

@@ -133,7 +133,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                   4: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                   5: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                   6: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  7: IntrinsicColumnWidth(), // 列寬度設定為自動調整
+                  7: FixedColumnWidth(0),
                 },
                 border: TableBorder.all(color: Colors.transparent),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -234,6 +234,10 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
           }
         }
 
+        int indexof_map = 0;
+        int indexof_mode = 0;
+        int indexof_team_score = 0;
+
         for (var rowData in tableData) {
           List<Widget> cells = [];
           for (var cellData in rowData) {
@@ -267,6 +271,9 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
           }
 
           if(tableData.indexOf(rowData) == 0){
+            indexof_map = rowData.indexOf("地圖");
+            indexof_mode = rowData.indexOf("模式");
+            indexof_team_score = rowData.indexOf("比數");
             matchtableRows.add(
               TableRow(
                 children: cells,
@@ -285,7 +292,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexof_map],rowData[indexof_mode],rowData[indexof_team_score]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                         ),
                       );
                     },
@@ -308,7 +315,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData,),
+                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexof_map],rowData[indexof_mode],rowData[indexof_team_score]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData,),
                         ),
                       );
                     },
@@ -330,7 +337,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexof_map],rowData[indexof_mode],rowData[indexof_team_score]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                         ),
                       );
                     },
@@ -352,7 +359,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexof_map],rowData[indexof_mode],rowData[indexof_team_score]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                         ),
                       );
                     },
@@ -370,7 +377,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Matchdtl(index:index,titlerowData:[rowData[1],rowData[2],rowData[3]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                        builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexof_map],rowData[indexof_mode],rowData[indexof_team_score]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                       ),
                     );
                   },
