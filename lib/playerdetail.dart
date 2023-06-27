@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:Valorant_Match/main.dart';
@@ -23,6 +25,7 @@ class Playerdt extends StatefulWidget {
 class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin{
   late AnimationController _controller;
   late Animation<double> _animation;
+
   int load_check = 0;
   String response = '';
 
@@ -131,7 +134,6 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                   4: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                   5: IntrinsicColumnWidth(), // 列寬度設定為自動調整
                   6: IntrinsicColumnWidth(), // 列寬度設定為自動調整
-                  7: FixedColumnWidth(0),
                 },
                 border: TableBorder.all(color: Colors.transparent),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -232,14 +234,24 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
           }
         }
 
-        int indexof_map = 0;
-        int indexof_mode = 0;
-        int indexof_team_score = 0;
+        int indexofMap = 0;
+        int indexofMode = 0;
+        int indexofTeamScore = 0;
+
+        int indexofWinloss = 0;
 
         for (var rowData in tableData) {
+          if(tableData.indexOf(rowData) == 0){
+            indexofMap = rowData.indexOf("地圖");
+            indexofMode = rowData.indexOf("模式");
+            indexofTeamScore = rowData.indexOf("比數");
+            indexofWinloss = rowData.indexOf("勝敗");
+          }
           List<Widget> cells = [];
           for (var cellData in rowData) {
-            if (cellData.startsWith('http')) {
+            if(rowData.indexOf(cellData) == indexofWinloss){
+              //忽略
+            }else if (cellData.startsWith('http')) {
               cells.add(
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -269,9 +281,6 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
           }
 
           if(tableData.indexOf(rowData) == 0){
-            indexof_map = rowData.indexOf("地圖");
-            indexof_mode = rowData.indexOf("模式");
-            indexof_team_score = rowData.indexOf("比數");
             matchtableRows.add(
               TableRow(
                 children: cells,
@@ -290,7 +299,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexof_map],rowData[indexof_mode],rowData[indexof_team_score]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexofMap],rowData[indexofMode],rowData[indexofTeamScore]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                         ),
                       );
                     },
@@ -313,7 +322,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexof_map],rowData[indexof_mode],rowData[indexof_team_score]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData,),
+                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexofMap],rowData[indexofMode],rowData[indexofTeamScore]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData,),
                         ),
                       );
                     },
@@ -335,7 +344,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexof_map],rowData[indexof_mode],rowData[indexof_team_score]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexofMap],rowData[indexofMode],rowData[indexofTeamScore]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                         ),
                       );
                     },
@@ -357,7 +366,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexof_map],rowData[indexof_mode],rowData[indexof_team_score]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                          builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexofMap],rowData[indexofMode],rowData[indexofTeamScore]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                         ),
                       );
                     },
@@ -375,7 +384,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexof_map],rowData[indexof_mode],rowData[indexof_team_score]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
+                        builder: (context) => Matchdtl(index:index,titlerowData:[rowData[indexofMap],rowData[indexofMode],rowData[indexofTeamScore]],gameName:gameName.toString(),tagLine:tagLine.toString(),jsonData: jsonData),
                       ),
                     );
                   },

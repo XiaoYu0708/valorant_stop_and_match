@@ -91,14 +91,12 @@ class _MatchdtlState extends State<Matchdtl> {
               Table(
                 columnWidths: const {
                   0: IntrinsicColumnWidth(),
-                  1: FixedColumnWidth(0),
-                  2: FixedColumnWidth(100),
-                  3: FixedColumnWidth(0),
+                  1: FixedColumnWidth(120),
+                  2: IntrinsicColumnWidth(),
+                  3: IntrinsicColumnWidth(),
                   4: IntrinsicColumnWidth(),
                   5: IntrinsicColumnWidth(),
                   6: IntrinsicColumnWidth(),
-                  7: IntrinsicColumnWidth(),
-                  8: IntrinsicColumnWidth(),
                 },
                 border: TableBorder.all(color: Colors.transparent),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -179,7 +177,6 @@ class _MatchdtlState extends State<Matchdtl> {
           String? jname = jsonData['data'][i]['players']['all_players'][j]['name'];
           String? jtag = jsonData['data'][i]['players']['all_players'][j]['tag'];
           String? jteam = jsonData['data'][i]['players']['all_players'][j]['team'];
-          String? jpuuid = jsonData['data'][i]['players']['all_players'][j]['puuid'];
 
           int jscore = jsonData['data'][i]['players']['all_players'][j]['stats']['score'];
           int rounds = jsonData['data'][i]['metadata']['rounds_played'];
@@ -209,10 +206,19 @@ class _MatchdtlState extends State<Matchdtl> {
           ]);
         }
 
+        int indexofTeam = 0;
+        int indexofTag = 0;
+
         for (var rowData in tableData) {
+          if(tableData.indexOf(rowData) == 0){
+            indexofTeam = rowData.indexOf("隊伍");
+            indexofTag = rowData.indexOf("標籤");
+          }
           List<Widget> cells = [];
           for (var cellData in rowData) {
-            if (cellData.startsWith('http')) {
+            if(rowData.indexOf(cellData) == indexofTeam || rowData.indexOf(cellData) == indexofTag){
+              //略過
+            } else if (cellData.startsWith('http')) {
               cells.add(
                 Padding(
                   padding: const EdgeInsets.all(8.0),
