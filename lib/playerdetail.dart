@@ -442,6 +442,7 @@ class _PlayerdtState extends State<Playerdt> with SingleTickerProviderStateMixin
   }
 
   void playerdw() async {
+    getmap();
     try {
       setState(() {
         playersmallCardImageUrl =
